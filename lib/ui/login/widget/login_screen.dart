@@ -18,39 +18,21 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _cpfController = TextEditingController();
+  final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
   bool _manterConectado = false;
   bool _senhaVisivel = false;
   bool _carregando = false;
 
-  /// Formata o CPF enquanto o usuário digita
-  String _formatarCPF(String cpf) {
-    cpf = cpf.replaceAll(RegExp(r'\D'), '');
-    if (cpf.length > 11) cpf = cpf.substring(0, 11);
-
-    if (cpf.length >= 3) {
-      cpf = '${cpf.substring(0, 3)}.${cpf.substring(3)}';
-    }
-    if (cpf.length >= 7) {
-      cpf = '${cpf.substring(0, 7)}.${cpf.substring(7)}';
-    }
-    if (cpf.length >= 11) {
-      cpf = '${cpf.substring(0, 11)}-${cpf.substring(11)}';
-    }
-
-    return cpf;
-  }
-
-  /// Valida o formato do CPF
-  String? _validarCPF(String? valor) {
+  /// Valida o formato do email
+  String? _validarEmail(String? valor) {
     if (valor == null || valor.isEmpty) {
-      return 'Por favor, informe o CPF';
+      return 'Por favor, informe o email';
     }
 
-    final cpfLimpo = valor.replaceAll(RegExp(r'\D'), '');
-    if (cpfLimpo.length != 11) {
-      return 'CPF deve conter 11 dígitos';
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(valor)) {
+      return 'Email inválido';
     }
 
     return null;
@@ -79,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     widget.viewModel.loginCommand.removeListener(_onLoginStateChanged);
-    _cpfController.dispose();
+    _emailController.dispose();
     _senhaController.dispose();
     super.dispose();
   }
@@ -133,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Executa o comando de login
     await widget.viewModel.loginCommand.execute((
-      cpf: _cpfController.text,
+      cpf: _emailController.text,
       password: _senhaController.text,
     ));
   }
@@ -407,8 +389,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const SizedBox(height: 32),
 
-            // Campo CPF
-            _buildCPFField(),
+            // Campo Email
+            _buildEmailField(),
 
             const SizedBox(height: 20),
 
@@ -430,41 +412,29 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /// Constrói o campo de CPF
-  Widget _buildCPFField() {
+  /// Constrói o campo de Email
+  Widget _buildEmailField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'CPF',
+          'Email',
           style: context.customTextTheme.textSmMedium.copyWith(
             color: context.customColorTheme.cardForeground,
           ),
         ),
         const SizedBox(height: 8),
         TextFormField(
-          controller: _cpfController,
-          keyboardType: TextInputType.number,
-          validator: _validarCPF,
-          onChanged: (valor) {
-            final posicaoCursor = _cpfController.selection.baseOffset;
-            final textoFormatado = _formatarCPF(valor);
-            final diferencaTamanho = textoFormatado.length - valor.length;
-
-            _cpfController.value = TextEditingValue(
-              text: textoFormatado,
-              selection: TextSelection.collapsed(
-                offset: posicaoCursor + diferencaTamanho,
-              ),
-            );
-          },
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          validator: _validarEmail,
           decoration: InputDecoration(
-            hintText: '000.000.000-00',
+            hintText: 'seu@email.com',
             hintStyle: context.customTextTheme.textBase.copyWith(
               color: context.customColorTheme.mutedForeground,
             ),
             prefixIcon: Icon(
-              Icons.person_outline_rounded,
+              Icons.email_outlined,
               color: context.customColorTheme.mutedForeground,
             ),
             filled: true,

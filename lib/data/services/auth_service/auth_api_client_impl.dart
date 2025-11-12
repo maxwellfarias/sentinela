@@ -39,10 +39,7 @@ class AuthApiClientImpl implements AuthApiClient {
           sendTimeout: timeOutDuration,
           receiveTimeout: timeOutDuration,
         ),
-        data: {
-          'email': loginRequest.cpf,
-          'password': loginRequest.password,
-        },
+        data: loginRequest.toJson(),
       );
 
       return _handleLoginResponse(response);

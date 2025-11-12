@@ -27,18 +27,18 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
   initialLocation: Routes.p1,
   debugLogDiagnostics: true,
   redirect: (context, state) async {
-    // final loggedIn = await authRepository.isAuthenticated;
-    // final loggingIn = state.matchedLocation == Routes.login;
+    final loggedIn = await authRepository.isAuthenticated;
+    final loggingIn = state.matchedLocation == Routes.login;
 
-    // // Se não estiver autenticado e não estiver na tela de login, redireciona para login
-    // if (!loggedIn && !loggingIn) {
-    //   return Routes.login;
-    // }
+    // Se não estiver autenticado e não estiver na tela de login, redireciona para login
+    if (!loggedIn && !loggingIn) {
+      return Routes.login;
+    }
 
-    // // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
-    // if (loggedIn && loggingIn) {
-    //   return Routes.aluno;
-    // }
+    // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
+    if (loggedIn && loggingIn) {
+      return Routes.p1;
+    }
     // Permite acesso a outras rotas
     return null;
   },

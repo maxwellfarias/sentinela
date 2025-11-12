@@ -1,9 +1,9 @@
 /// Model para resposta do login
 ///
-/// Contém todos os dados retornados pela API após autenticação bem-sucedida:
-/// - Token JWT para autenticação
+/// Contém todos os dados retornados pela API Supabase após autenticação bem-sucedida:
+/// - Token JWT (access_token) para autenticação
 /// - Refresh token para renovação
-/// - Informações do usuário e permissões
+/// - Informações do usuário
 class LoginResponse {
   /// Token JWT para autenticação nas requisições
   final String token;
@@ -14,7 +14,7 @@ class LoginResponse {
   /// Data e hora de expiração do token (formato ISO 8601)
   final String expires;
 
-  /// Número do banco de dados do usuário
+  /// Número do banco de dados do usuário (opcional para compatibilidade)
   final int numeroBancoDados;
 
   /// Nome completo do usuário
@@ -24,13 +24,16 @@ class LoginResponse {
   final String role;
 
   /// ID do usuário
-  final int id;
+  final String id;
 
   /// Data de criação do usuário (formato ISO 8601)
   final String dataCriacao;
 
   /// Indica se o usuário está ativo
   final bool ativo;
+
+  /// Email do usuário (do Supabase)
+  final String email;
 
   LoginResponse({
     required this.token,
@@ -42,6 +45,7 @@ class LoginResponse {
     required this.id,
     required this.dataCriacao,
     required this.ativo,
+    required this.email,
   });
 
   /// Converte o objeto para JSON
@@ -56,21 +60,32 @@ class LoginResponse {
       'id': id,
       'dataCriacao': dataCriacao,
       'ativo': ativo,
+      'email': email,
     };
   }
 
-  /// Cria um objeto a partir do JSON retornado pela API
+  /// Cria um objeto a partir do JSON retornado pela API Supabase
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    // Extrai informações do usuário
+    final user = json['user'] as Map<String, dynamic>? ?? {};
+    final email = user['email'] as String? ?? '';
+    final userId = user['id'] as String? ?? '';
+
+    // Calcula a data de expiração do token
+    final expiresIn = json['expires_in'] as int? ?? 3600;
+    final expiresAt = DateTime.now().add(Duration(seconds: expiresIn)).toIso8601String();
+
     return LoginResponse(
-      token: json['token'] as String,
-      refreshToken: json['refreshToken'] as String,
-      expires: json['expires'] as String,
-      numeroBancoDados: json['numeroBancoDados'] as int,
-      username: json['username'] as String,
-      role: json['role'] as String,
-      id: json['id'] as int,
-      dataCriacao: json['dataCriacao'] as String,
-      ativo: json['ativo'] as bool,
+      token: json['access_token'] as String? ?? '',
+      refreshToken: json['refresh_token'] as String? ?? '',
+      expires: expiresAt,
+      numeroBancoDados: 1, // Valor padrão
+      username: email.split('@').first, // Usa parte do email como username
+      role: user['role'] as String? ?? 'user',
+      id: userId,
+      dataCriacao: user['created_at'] as String? ?? DateTime.now().toIso8601String(),
+      ativo: true,
+      email: email,
     );
   }
 }
