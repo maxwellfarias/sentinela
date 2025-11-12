@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:w3_diploma/config/dependencies.dart';
 import 'package:w3_diploma/data/repositories/auth/auth_repository.dart';
 import 'package:w3_diploma/routing/router.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:w3_diploma/ui/core/themes/theme.dart';
 
-void main() {
- // Retira o hash da URL para uma navegação mais limpa
-  setUrlStrategy(PathUrlStrategy());
+Future<void> main() async {
+  // Carrega variáveis de ambiente
+  await dotenv.load(fileName: '.env');
+
+  // Retira o hash da URL para uma navegação mais limpa
+  // setUrlStrategy(PathUrlStrategy());
+
   // Configura as dependências do aplicativo
   runApp(MultiProvider(providers: providers, child: const MyApp()));
 }

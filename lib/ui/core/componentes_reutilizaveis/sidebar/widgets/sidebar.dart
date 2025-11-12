@@ -21,6 +21,40 @@ class Sidebar extends StatefulWidget {
 }
 
 class _SidebarState extends State<Sidebar> {
+  /// Manipula o logout do usuário
+  Future<void> _handleLogout(BuildContext context) async {
+    // Captura o messenger e navigator antes do async gap
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    final colorTheme = context.customColorTheme;
+
+    await widget.viewModel.logout.execute();
+
+    if (!mounted) return;
+
+    // Verifica se houve erro no logout
+    if (widget.viewModel.logout.error) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Erro ao fazer logout: ${widget.viewModel.logout.errorMessage ?? 'Erro desconhecido'}',
+          ),
+          backgroundColor: colorTheme.destructive,
+        ),
+      );
+    } else if (widget.viewModel.logout.completed) {
+      // Logout bem-sucedido - navega para tela de login
+      router.go(Routes.login);
+
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Logout realizado com sucesso'),
+          backgroundColor: colorTheme.success,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -121,22 +155,40 @@ class _SidebarState extends State<Sidebar> {
               //   },
               // ),
               // SizedBox(height: 8),
-              TextButton(
-                // onPressed: () => widget.viewModel.logout.execute(),
-                onPressed: () {},
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 8,
-                  children: [
-                    Icon(Icons.logout, color: context.customColorTheme.accent),
-                    Text(
-                      'Sair',
-                      style: context.customTextTheme.textSmSemibold.copyWith(
-                        color: context.customColorTheme.accent,
-                      ),
+              ListenableBuilder(
+                listenable: widget.viewModel.logout,
+                builder: (context, child) {
+                  return TextButton(
+                    onPressed: widget.viewModel.logout.running
+                        ? null
+                        : () => _handleLogout(context),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 8,
+                      children: [
+                        if (widget.viewModel.logout.running)
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(
+                                context.customColorTheme.accent,
+                              ),
+                            ),
+                          )
+                        else
+                          Icon(Icons.logout, color: context.customColorTheme.accent),
+                        Text(
+                          widget.viewModel.logout.running ? 'Saindo...' : 'Sair',
+                          style: context.customTextTheme.textSmSemibold.copyWith(
+                            color: context.customColorTheme.accent,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
               SizedBox(height: 14),
             ],

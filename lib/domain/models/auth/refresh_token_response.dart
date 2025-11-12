@@ -1,10 +1,10 @@
 /// Model para resposta do refresh token
 ///
-/// Contém os mesmos dados retornados no login:
-/// - Novo token JWT
-/// - Novo refresh token
-/// - Data de expiração
-/// - Informações do usuário
+/// Formato Supabase: retorna os mesmos dados do login
+/// - access_token (novo token JWT)
+/// - refresh_token (novo refresh token)
+/// - expires_in (segundos até expirar)
+/// - user (informações do usuário)
 class RefreshTokenResponse {
   /// Novo token JWT para autenticação
   final String token;
@@ -15,7 +15,7 @@ class RefreshTokenResponse {
   /// Data e hora de expiração do token (formato ISO 8601)
   final String expires;
 
-  /// Número do banco de dados do usuário
+  /// Número do banco de dados do usuário (compatibilidade)
   final int numeroBancoDados;
 
   /// Nome completo do usuário
@@ -25,13 +25,16 @@ class RefreshTokenResponse {
   final String role;
 
   /// ID do usuário
-  final int id;
+  final String id;
 
   /// Data de criação do usuário (formato ISO 8601)
   final String dataCriacao;
 
   /// Indica se o usuário está ativo
   final bool ativo;
+
+  /// Email do usuário (do Supabase)
+  final String email;
 
   RefreshTokenResponse({
     required this.token,
@@ -43,6 +46,7 @@ class RefreshTokenResponse {
     required this.id,
     required this.dataCriacao,
     required this.ativo,
+    required this.email,
   });
 
   /// Converte o objeto para JSON
@@ -57,21 +61,32 @@ class RefreshTokenResponse {
       'id': id,
       'dataCriacao': dataCriacao,
       'ativo': ativo,
+      'email': email,
     };
   }
 
-  /// Cria um objeto a partir do JSON retornado pela API
+  /// Cria um objeto a partir do JSON retornado pela API Supabase
   factory RefreshTokenResponse.fromJson(Map<String, dynamic> json) {
+    // Extrai informações do usuário
+    final user = json['user'] as Map<String, dynamic>? ?? {};
+    final email = user['email'] as String? ?? '';
+    final userId = user['id'] as String? ?? '';
+
+    // Calcula a data de expiração do token
+    final expiresIn = json['expires_in'] as int? ?? 3600;
+    final expiresAt = DateTime.now().add(Duration(seconds: expiresIn)).toIso8601String();
+
     return RefreshTokenResponse(
-      token: json['token'] as String,
-      refreshToken: json['refreshToken'] as String,
-      expires: json['expires'] as String,
-      numeroBancoDados: json['numeroBancoDados'] as int,
-      username: json['username'] as String,
-      role: json['role'] as String,
-      id: json['id'] as int,
-      dataCriacao: json['dataCriacao'] as String,
-      ativo: json['ativo'] as bool,
+      token: json['access_token'] as String? ?? '',
+      refreshToken: json['refresh_token'] as String? ?? '',
+      expires: expiresAt,
+      numeroBancoDados: 1, // Valor padrão
+      username: email.split('@').first, // Usa parte do email como username
+      role: user['role'] as String? ?? 'user',
+      id: userId,
+      dataCriacao: user['created_at'] as String? ?? DateTime.now().toIso8601String(),
+      ativo: true,
+      email: email,
     );
   }
 }

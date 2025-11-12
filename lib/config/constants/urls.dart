@@ -1,13 +1,14 @@
-abstract final class Urls {
-  static bool isUsingLocalhost = true;
-  static Map<String, String> bearerHeader = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlx'};
-  static String urlBase = isUsingLocalhost ?  'https://localhost:5290/api/' : 'https://w3soft3.com.br/W3DiplomaAPI/api/';
-  // static String urlBase = isUsingLocalhost ?  'https://localhost:44370/api/' : 'https://w3soft3.com.br/W3DiplomaAPI/api/';
-  static String buscarCepApi({required String cep}) => 'https://viacep.com.br/ws/$cep/json/';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-  // Supabase Configuration
-  static const String supabaseUrl = 'https://fkwbaagyzxafgaphidfb.supabase.co';
-  static const String supabaseApiKey = 'sb_publishable_yehVgeZN4iWGS4nrEGRb2w_-A9MQt6K';
+abstract final class Urls {
+  // Supabase Configuration (carregado de variáveis de ambiente)
+  static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? '';
+  static String get supabaseApiKey => dotenv.env['SUPABASE_ANON_KEY'] ?? '';
+
+  // URLs de API legadas (manter para compatibilidade com outros endpoints)
+  static bool isUsingLocalhost = true;
+  static String urlBase = isUsingLocalhost ?  'https://localhost:5290/api/' : 'https://w3soft3.com.br/W3DiplomaAPI/api/';
+  static String buscarCepApi({required String cep}) => 'https://viacep.com.br/ws/$cep/json/';
 
   //AUTH
   ///POST: /auth/v1/token?grant_type=password
@@ -15,15 +16,15 @@ abstract final class Urls {
   ///Retorna: Supabase auth response com access_token, refresh_token, etc.
   static String login() => '$supabaseUrl/auth/v1/token?grant_type=password';
 
-  ///POST: /api/Revoke
-  ///Revoga o refresh token (logout)
-  ///Retorna: { "success": true, "message": "Logout realizado com sucesso" }
-  static String logout() => '${urlBase}Revoke';
+  ///POST: /auth/v1/logout
+  ///Revoga o refresh token (logout) no Supabase
+  ///Headers: { "apikey": "...", "Authorization": "Bearer ..." }
+  static String logout() => '$supabaseUrl/auth/v1/logout';
 
-  ///POST: /api/Refresh
-  ///Espera: { "token": "...", "refreshToken": "..." }
-  ///Retorna: { "token", "refreshToken", "expires", "numeroBancoDados", "username", "role", "id", "dataCriacao", "ativo" }
-  static String refreshToken() => '${urlBase}Refresh';
+  ///POST: /auth/v1/token?grant_type=refresh_token
+  ///Espera: { "refresh_token": "..." }
+  ///Retorna: Supabase auth response com novos access_token e refresh_token
+  static String refreshToken() => '$supabaseUrl/auth/v1/token?grant_type=refresh_token';
 
   static String urlBuscarCursos({required String clienteID}) => '${urlBase}cursos/getCursos/$clienteID';
   static String urlBuscarTurmas({required String clienteID}) => '${urlBase}turmas/getTurmas/$clienteID';

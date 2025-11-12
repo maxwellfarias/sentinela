@@ -49,7 +49,7 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
       navigatorKey: _mainShellNavigatorKey,
       pageBuilder: (context, state, child) {
         final sidebarViewModel = SidebarViewModel(
-          // authRepository: context.read(),
+          authRepository: context.read(),
         );
         return MaterialPage(
           child: LayoutResponsivo(

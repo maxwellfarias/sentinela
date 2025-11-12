@@ -30,7 +30,14 @@ class AuthApiClientImpl implements AuthApiClient {
 
     Response? response;
     try {
-      AppLogger.info('Login - Email: ${loginRequest.cpf}, url: $url', tag: _logTag, );
+      final requestData = loginRequest.toJson();
+      AppLogger.info(
+        'Login - Iniciando requisição\n'
+        'URL: $url\n'
+        'Headers: $headers\n'
+        'Body: ${requestData.toString().replaceAll(RegExp(r'"password":"[^"]*"'), '"password":"***"')}',
+        tag: _logTag,
+      );
 
       response = await _dio.post(
         url,
@@ -39,7 +46,14 @@ class AuthApiClientImpl implements AuthApiClient {
           sendTimeout: timeOutDuration,
           receiveTimeout: timeOutDuration,
         ),
-        data: loginRequest.toJson(),
+        data: requestData,
+      );
+
+      AppLogger.info(
+        'Login - Resposta recebida\n'
+        'Status: ${response.statusCode}\n'
+        'Body: ${response.data.toString().substring(0, response.data.toString().length > 200 ? 200 : response.data.toString().length)}...',
+        tag: _logTag,
       );
 
       return _handleLoginResponse(response);
@@ -63,7 +77,7 @@ class AuthApiClientImpl implements AuthApiClient {
     }
   }
 
-  /// Renova o token de autenticação usando refresh token
+  /// Renova o token de autenticação usando refresh token do Supabase
   @override
   Future<Result<RefreshTokenResponse>> refreshToken(
     RefreshTokenRequest refreshTokenRequest,
@@ -71,12 +85,12 @@ class AuthApiClientImpl implements AuthApiClient {
     final url = Urls.refreshToken();
     final headers = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      'apikey': Urls.supabaseApiKey,
     };
 
     Response? response;
     try {
-      AppLogger.info('Renovando token', tag: _logTag);
+      AppLogger.info('Renovando token - URL: $url', tag: _logTag);
 
       response = await _dio.post(
         url,
@@ -86,6 +100,12 @@ class AuthApiClientImpl implements AuthApiClient {
           receiveTimeout: timeOutDuration,
         ),
         data: refreshTokenRequest.toJson(),
+      );
+
+      AppLogger.info(
+        'Refresh Token - Resposta recebida\n'
+        'Status: ${response.statusCode}',
+        tag: _logTag,
       );
 
       return _handleRefreshTokenResponse(response);
@@ -117,18 +137,18 @@ class AuthApiClientImpl implements AuthApiClient {
     }
   }
 
-  /// Realiza logout no servidor (revoga o refresh token)
+  /// Realiza logout no servidor Supabase (revoga o refresh token)
   @override
   Future<Result<void>> logout(String token) async {
     final url = Urls.logout();
     final headers = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      'apikey': Urls.supabaseApiKey,
       'Authorization': 'Bearer $token',
     };
 
     try {
-      AppLogger.info('Logout', tag: _logTag);
+      AppLogger.info('Logout - URL: $url', tag: _logTag);
 
       await _dio.post(
         url,
@@ -139,6 +159,7 @@ class AuthApiClientImpl implements AuthApiClient {
         ),
       );
 
+      AppLogger.info('Logout realizado com sucesso no Supabase', tag: _logTag);
       return const Result.ok(null);
     } catch (error) {
       AppLogger.error('Erro ao fazer logout: $error', tag: _logTag, error: error);

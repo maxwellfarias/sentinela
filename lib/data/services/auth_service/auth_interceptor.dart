@@ -197,30 +197,37 @@ class AuthInterceptor extends Interceptor {
 
       AppLogger.info('Enviando requisição de refresh token', tag: _logTag);
 
-      // Faz a requisição de refresh (sem o interceptor para evitar loop)
+      // Faz a requisição de refresh no Supabase (sem o interceptor para evitar loop)
       final response = await _dio.post(
         Urls.refreshToken(),
         data: refreshRequest.toJson(),
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            'apikey': Urls.supabaseApiKey,
           },
         ),
       );
 
       if (response.statusCode == 200) {
-        // Parse da resposta
+        // Parse da resposta do Supabase
         final data = response.data as Map<String, dynamic>;
+        final user = data['user'] as Map<String, dynamic>? ?? {};
+
+        // Calcula expiração
+        final expiresIn = data['expires_in'] as int? ?? 3600;
+        final expiresAt = DateTime.now().add(Duration(seconds: expiresIn)).toIso8601String();
 
         // Salva os novos tokens e informações
-        await _storageService.saveToken(data['token'] as String);
-        await _storageService.saveRefreshToken(data['refreshToken'] as String);
-        await _storageService.saveTokenExpires(data['expires'] as String);
-        await _storageService.saveUsername(data['username'] as String);
-        await _storageService.saveUserRole(data['role'] as String);
-        await _storageService.saveNumeroBancoDados(data['numeroBancoDados'] as int);
-        await _storageService.saveUserId(data['id'].toString());
+        await _storageService.saveToken(data['access_token'] as String);
+        await _storageService.saveRefreshToken(data['refresh_token'] as String);
+        await _storageService.saveTokenExpires(expiresAt);
+
+        final email = user['email'] as String? ?? '';
+        await _storageService.saveUsername(email.split('@').first);
+        await _storageService.saveUserRole(user['role'] as String? ?? 'user');
+        await _storageService.saveNumeroBancoDados(1);
+        await _storageService.saveUserId(user['id'] as String? ?? '');
 
         AppLogger.info('Token renovado com sucesso', tag: _logTag);
         return true;

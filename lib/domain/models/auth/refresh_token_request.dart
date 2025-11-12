@@ -1,32 +1,31 @@
 /// Model para requisição de refresh token
 ///
-/// Envia o token JWT atual e o refresh token para obter
-/// um novo par de tokens antes que o token atual expire.
+/// Formato Supabase: envia apenas o refresh_token para obter
+/// um novo par de tokens (access_token e refresh_token).
 class RefreshTokenRequest {
-  /// Token JWT atual (pode estar expirado ou próximo de expirar)
-  final String token;
+  /// Token JWT atual (mantido para compatibilidade, mas Supabase não usa)
+  final String? token;
 
-  /// Refresh token obtido no login
+  /// Refresh token obtido no login - usado pelo Supabase
   final String refreshToken;
 
   RefreshTokenRequest({
-    required this.token,
+    this.token,
     required this.refreshToken,
   });
 
-  /// Converte o objeto para JSON para enviar na requisição
+  /// Converte o objeto para JSON no formato Supabase
   Map<String, dynamic> toJson() {
     return {
-      'token': token,
-      'refreshToken': refreshToken,
+      'refresh_token': refreshToken, // Formato Supabase
     };
   }
 
   /// Cria um objeto a partir do JSON
   factory RefreshTokenRequest.fromJson(Map<String, dynamic> json) {
     return RefreshTokenRequest(
-      token: json['token'] as String,
-      refreshToken: json['refreshToken'] as String,
+      token: json['token'] as String?,
+      refreshToken: json['refreshToken'] as String? ?? json['refresh_token'] as String,
     );
   }
 }
