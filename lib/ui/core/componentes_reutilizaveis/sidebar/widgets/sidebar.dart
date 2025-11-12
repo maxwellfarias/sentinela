@@ -162,30 +162,49 @@ class _SidebarState extends State<Sidebar> {
                     onPressed: widget.viewModel.logout.running
                         ? null
                         : () => _handleLogout(context),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 8,
-                      children: [
-                        if (widget.viewModel.logout.running)
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation(
-                                context.customColorTheme.accent,
-                              ),
-                            ),
-                          )
-                        else
-                          Icon(Icons.logout, color: context.customColorTheme.accent),
-                        Text(
-                          widget.viewModel.logout.running ? 'Saindo...' : 'Sair',
-                          style: context.customTextTheme.textSmSemibold.copyWith(
-                            color: context.customColorTheme.accent,
-                          ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: context.customColorTheme.border,
+                          width: 1,
                         ),
-                      ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 8,
+                        children: [
+                          if (widget.viewModel.logout.running)
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation(
+                                  context.customColorTheme.accent,
+                                ),
+                              ),
+                            )
+                          else
+                            Icon(
+                              Icons.logout,
+                              color:
+                                  context.customColorTheme.secondaryForeground,
+                            ),
+                          Text(
+                            widget.viewModel.logout.running
+                                ? 'Saindo...'
+                                : 'Sair',
+                            style: context.customTextTheme.textSmSemibold
+                                .copyWith(
+                                  color: context
+                                      .customColorTheme
+                                      .secondaryForeground,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
