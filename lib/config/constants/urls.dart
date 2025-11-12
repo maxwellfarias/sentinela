@@ -5,11 +5,15 @@ abstract final class Urls {
   // static String urlBase = isUsingLocalhost ?  'https://localhost:44370/api/' : 'https://w3soft3.com.br/W3DiplomaAPI/api/';
   static String buscarCepApi({required String cep}) => 'https://viacep.com.br/ws/$cep/json/';
 
+  // Supabase Configuration
+  static const String supabaseUrl = 'https://fkwbaagyzxafgaphidfb.supabase.co';
+  static const String supabaseApiKey = 'sb_publishable_yehVgeZN4iWGS4nrEGRb2w_-A9MQt6K';
+
   //AUTH
-  ///POST: /login/1
-  ///Espera: { "cpf": "000.000.000-52", "password": "senha" }
-  ///Retorna: { "token", "refreshToken", "expires", "numeroBancoDados", "username", "role", "id", "dataCriacao", "ativo" }
-  static String login() => 'https://localhost:5290/login/1';
+  ///POST: /auth/v1/token?grant_type=password
+  ///Espera: { "email": "someone@email.com", "password": "senha" }
+  ///Retorna: Supabase auth response com access_token, refresh_token, etc.
+  static String login() => '$supabaseUrl/auth/v1/token?grant_type=password';
 
   ///POST: /api/Revoke
   ///Revoga o refresh token (logout)

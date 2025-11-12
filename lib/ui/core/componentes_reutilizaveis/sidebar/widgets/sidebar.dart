@@ -5,13 +5,16 @@ import 'package:w3_diploma/ui/core/componentes_reutilizaveis/sidebar/viewmodel/s
 import 'package:w3_diploma/ui/core/extensions/build_context_extension.dart';
 import 'package:w3_diploma/ui/core/themes/colors.dart';
 
-
 final myDefaultBackground = Colors.grey[300];
 
 class Sidebar extends StatefulWidget {
   final ValueNotifier<int> sideBarIndex;
   final SidebarViewModel viewModel;
-  const Sidebar({super.key, required this.sideBarIndex, required this.viewModel});
+  const Sidebar({
+    super.key,
+    required this.sideBarIndex,
+    required this.viewModel,
+  });
 
   @override
   State<Sidebar> createState() => _SidebarState();
@@ -46,64 +49,16 @@ class _SidebarState extends State<Sidebar> {
                   horizontal: 60,
                 ),
                 child: Text(
-                  "W3SOFT",
+                  "Sentinela",
                   style: context.customTextTheme.textLgSemibold,
                 ),
               ),
               HoverableListTile(
-                    title: 'Alunos',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 0,
-                    rotaParaNavegacao: Routes.aluno,
-                  ),
-                  HoverableListTile(
-                    title: 'Cursos',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 1,
-                    rotaParaNavegacao: Routes.curso ,
-                  ),
-                  HoverableListTile(
-                    title: 'IES Emissora',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 2,
-                    rotaParaNavegacao: Routes.iesEmissora,
-                  ),
-                  // HoverableListTile(
-                  //   title: 'IES Registradora',
-                  //   indexGlobalSideBar: widget.sideBarIndex,
-                  //   itemId: 3,
-                  //   rotaParaNavegacao: Routes.iesRegistradora,
-                  // ),
-                  HoverableListTile(
-                    title: 'Docentes',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 4,
-                    rotaParaNavegacao: Routes.docente,
-                  ),
-                  HoverableListTile(
-                    title: 'Disciplina Histórico',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 5,
-                    rotaParaNavegacao: Routes.disciplinaHistorico,
-                  ),
-                  HoverableListTile(
-                    title: 'Atividades Complementares',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 6,
-                    rotaParaNavegacao: Routes.atividadeComplementar,
-                  ),
-                  HoverableListTile(
-                    title: 'Registro de Diplomas',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 7,
-                    rotaParaNavegacao: Routes.registroDiploma,
-                  ),
-                  HoverableListTile(
-                    title: 'Gerar XML e Documentação Acadêmica',
-                    indexGlobalSideBar: widget.sideBarIndex,
-                    itemId: 8,
-                    rotaParaNavegacao: Routes.gerarXmlDocumentacaoAcademica,
-                  ),
+                title: 'P1',
+                indexGlobalSideBar: widget.sideBarIndex,
+                itemId: 0,
+                rotaParaNavegacao: Routes.p1,
+              ),
               // CustomExpansionTile(
               //   title: 'Geral',
               //   children: [
@@ -214,7 +169,8 @@ class CustomExpansionTile extends StatefulWidget {
   State<CustomExpansionTile> createState() => _CustomExpansionTileState();
 }
 
-class _CustomExpansionTileState extends State<CustomExpansionTile> with SingleTickerProviderStateMixin {
+class _CustomExpansionTileState extends State<CustomExpansionTile>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _expandAnimation;
   late Color _textColor; // Cor padrão
@@ -266,19 +222,29 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> with SingleTi
     return Column(
       children: [
         MouseRegion(
-          onEnter: (event) => setState(() => _textColor = AppColors.primaryDark), // Cor ao passar o mouse
-          onExit: (event) => setState(() => _textColor = context.customColorTheme.accent), // Volta à cor padrão
+          onEnter: (event) => setState(
+            () => _textColor = AppColors.primaryDark,
+          ), // Cor ao passar o mouse
+          onExit: (event) => setState(
+            () => _textColor = context.customColorTheme.accent,
+          ), // Volta à cor padrão
           child: InkWell(
             onTap: _toggleExpansion,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.folder, color: context.customColorTheme.accent, size: 20),
+                Icon(
+                  Icons.folder,
+                  color: context.customColorTheme.accent,
+                  size: 20,
+                ),
                 SizedBox(width: 10), // Espaçamento entre o ícone e o texto
                 Expanded(
                   child: Text(
                     widget.title,
-                    style: context.customTextTheme.textSmSemibold.copyWith(color: _textColor),
+                    style: context.customTextTheme.textSmSemibold.copyWith(
+                      color: _textColor,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -346,7 +312,8 @@ class _HoverableListTileState extends State<HoverableListTile> {
     return MouseRegion(
       onEnter: (event) => setState(() {
         _isHovering = true;
-        _backgroundColor = context.customColorTheme.accent; // Cor ao passar o mouse
+        _backgroundColor =
+            context.customColorTheme.accent; // Cor ao passar o mouse
       }),
       onExit: (event) => setState(() {
         _isHovering = false;
@@ -361,7 +328,9 @@ class _HoverableListTileState extends State<HoverableListTile> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? context.customColorTheme.accent : _backgroundColor,
+            color: isSelected
+                ? context.customColorTheme.accent
+                : _backgroundColor,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Container(
@@ -370,7 +339,9 @@ class _HoverableListTileState extends State<HoverableListTile> {
             child: Text(
               widget.title,
               style: context.customTextTheme.textSmMedium.copyWith(
-                color: (_isHovering || isSelected) ? AppColors.primaryDark : context.customColorTheme.sidebarForeground,
+                color: (_isHovering || isSelected)
+                    ? AppColors.primaryDark
+                    : context.customColorTheme.sidebarForeground,
               ),
             ),
           ),

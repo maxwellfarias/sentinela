@@ -15,7 +15,7 @@ import 'package:w3_diploma/ui/core/componentes_reutilizaveis/resposive_layout.da
 
 import 'package:w3_diploma/ui/login/widget/login_screen.dart';
 import 'package:w3_diploma/ui/login/widget/viewmodel/login_viewmodel.dart';
-
+import 'package:w3_diploma/ui/p1_screen/widget/p1_screen.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _mainShellNavigatorKey = GlobalKey<NavigatorState>();
@@ -23,23 +23,22 @@ final _sideBarIndex = ValueNotifier<int>(8);
 
 GoRouter router(AuthRepository authRepository) => GoRouter(
   navigatorKey: _rootNavigationKey,
-    // initialLocation: Routes.gerarXmlDocumentacaoAcademica,
-    initialLocation: Routes.home,
+  // initialLocation: Routes.gerarXmlDocumentacaoAcademica,
+  initialLocation: Routes.p1,
   debugLogDiagnostics: true,
   redirect: (context, state) async {
-    final loggedIn = await authRepository.isAuthenticated;
-    final loggingIn = state.matchedLocation == Routes.login;
+    // final loggedIn = await authRepository.isAuthenticated;
+    // final loggingIn = state.matchedLocation == Routes.login;
 
-    // Se não estiver autenticado e não estiver na tela de login, redireciona para login
-    if (!loggedIn && !loggingIn) {
-      return Routes.login;
-    }
+    // // Se não estiver autenticado e não estiver na tela de login, redireciona para login
+    // if (!loggedIn && !loggingIn) {
+    //   return Routes.login;
+    // }
 
-    // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
-    if (loggedIn && loggingIn) {
-      return Routes.aluno;
-    }
-
+    // // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
+    // if (loggedIn && loggingIn) {
+    //   return Routes.aluno;
+    // }
     // Permite acesso a outras rotas
     return null;
   },
@@ -52,19 +51,21 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
         final sidebarViewModel = SidebarViewModel(
           // authRepository: context.read(),
         );
-        return MaterialPage(child: LayoutResponsivo(
-        sidebar: Sidebar(sideBarIndex: _sideBarIndex, viewModel: sidebarViewModel),
-        child: child));
+        return MaterialPage(
+          child: LayoutResponsivo(
+            sidebar: Sidebar(
+              sideBarIndex: _sideBarIndex,
+              viewModel: sidebarViewModel,
+            ),
+            child: child,
+          ),
+        );
       },
       routes: [
-        GoRoute(
-          path: Routes.home,
-          builder: (context, state) => Center(child: Text("My home")),
-        ),
-
-
+        GoRoute(path: Routes.p1, builder: (context, state) => P1Screen()),
       ],
     ),
+
     // GoRoute(
     //   path: Routes.login,
     //   builder: (context, state) => LoginScreen(viewModel: context.read())
@@ -76,8 +77,7 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
     //         appBar: AppBar(title: SelectableText("signup")),
     //         body: Center(child: SelectableText("My signup")),
     //       ),
-    // ), 
-
+    // ),
     GoRoute(
       path: Routes.login,
       builder: (context, state) => LoginScreen(
@@ -86,4 +86,3 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
     ),
   ],
 );
-

@@ -24,7 +24,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _senhaVisivel = false;
   bool _carregando = false;
 
-
   /// Formata o CPF enquanto o usuário digita
   String _formatarCPF(String cpf) {
     cpf = cpf.replaceAll(RegExp(r'\D'), '');
@@ -235,8 +234,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    context.customColorTheme.primaryLight.withValues(alpha: 0.2),
-                    context.customColorTheme.primaryLight.withValues(alpha: 0.0),
+                    context.customColorTheme.primaryLight.withValues(
+                      alpha: 0.2,
+                    ),
+                    context.customColorTheme.primaryLight.withValues(
+                      alpha: 0.0,
+                    ),
                   ],
                 ),
               ),
@@ -296,8 +299,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(12),
                   gradient: LinearGradient(
                     colors: [
-                      context.customColorTheme.primaryShade.withValues(alpha: 0.06),
-                      context.customColorTheme.primaryShade.withValues(alpha: 0.0),
+                      context.customColorTheme.primaryShade.withValues(
+                        alpha: 0.06,
+                      ),
+                      context.customColorTheme.primaryShade.withValues(
+                        alpha: 0.0,
+                      ),
                     ],
                   ),
                 ),
@@ -329,7 +336,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
           child: Icon(
-            Icons.school_rounded,
+            Icons.security,
             size: 40,
             color: context.customColorTheme.primaryForeground,
           ),
@@ -339,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Título
         Text(
-          'W3Diploma',
+          'Sentilela',
           style: context.customTextTheme.text3xlBold.copyWith(
             color: context.customColorTheme.foreground,
           ),
@@ -366,10 +373,7 @@ class _LoginScreenState extends State<LoginScreen> {
       decoration: BoxDecoration(
         color: context.customColorTheme.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.customColorTheme.border,
-          width: 1,
-        ),
+        border: Border.all(color: context.customColorTheme.border, width: 1),
         boxShadow: [
           BoxShadow(
             color: context.customColorTheme.shadowCard,
@@ -651,9 +655,7 @@ class _LoginScreenState extends State<LoginScreen> {
           disabledForegroundColor: context.customColorTheme.mutedForeground,
           elevation: 0,
           shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: _carregando
             ? SizedBox(

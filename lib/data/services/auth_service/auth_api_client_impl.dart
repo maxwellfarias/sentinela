@@ -25,13 +25,12 @@ class AuthApiClientImpl implements AuthApiClient {
     final url = Urls.login();
     final headers = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      'apikey': Urls.supabaseApiKey,
     };
 
     Response? response;
     try {
-      AppLogger.info('Login - CPF: ${loginRequest.cpf}, url: $url', tag: _logTag, );
-
+      AppLogger.info('Login - Email: ${loginRequest.cpf}, url: $url', tag: _logTag, );
 
       response = await _dio.post(
         url,
@@ -40,7 +39,10 @@ class AuthApiClientImpl implements AuthApiClient {
           sendTimeout: timeOutDuration,
           receiveTimeout: timeOutDuration,
         ),
-        data: loginRequest.toJson(),
+        data: {
+          'email': loginRequest.cpf,
+          'password': loginRequest.password,
+        },
       );
 
       return _handleLoginResponse(response);
