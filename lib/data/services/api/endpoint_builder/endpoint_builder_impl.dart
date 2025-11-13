@@ -1,5 +1,6 @@
+
 import 'package:sentinela/config/constants/http_types.dart';
-import 'package:sentinela/data/services/http/endpoint_builder/endpoint_builder.dart';
+import 'package:sentinela/data/services/api/endpoint_builder/endpoint_builder.dart';
 
 /// Implementation of EndpointBuilder for building Supabase API endpoints
 ///

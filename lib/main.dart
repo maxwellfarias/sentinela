@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:w3_diploma/config/dependencies.dart';
-import 'package:w3_diploma/data/repositories/auth/auth_repository.dart';
-import 'package:w3_diploma/routing/router.dart';
-import 'package:w3_diploma/ui/core/themes/theme.dart';
+import 'package:sentinela/config/dependencies.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/routing/router.dart';
+import 'package:sentinela/ui/core/themes/theme.dart';
 
 Future<void> main() async {
   // Carrega variáveis de ambiente

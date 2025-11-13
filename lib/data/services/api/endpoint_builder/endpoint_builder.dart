@@ -1,5 +1,4 @@
 
-
 import 'package:sentinela/config/constants/http_types.dart';
 
 /// Interface for building API endpoints

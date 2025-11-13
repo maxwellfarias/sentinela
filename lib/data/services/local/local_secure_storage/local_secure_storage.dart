@@ -1,4 +1,4 @@
-import 'package:palliative_care/utils/result.dart';
+import 'package:sentinela/utils/result.dart';
 
 abstract interface class LocalSecureStorage {
   Future<Result<dynamic>> write({required String key, required String value});

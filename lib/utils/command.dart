@@ -1,7 +1,7 @@
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:w3_diploma/exceptions/app_exception.dart';
+import 'package:sentinela/exceptions/app_exception.dart';
 
 import 'result.dart';
 

@@ -1,9 +1,9 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:palliative_care/core/interfaces/logger.dart';
-import 'package:palliative_care/data/services/local/local_secure_storage/local_secure_storage.dart';
-import 'package:palliative_care/exceptions/app_exception.dart';
-import 'package:palliative_care/utils/result.dart';
+import 'package:sentinela/data/services/local/local_secure_storage/local_secure_storage.dart';
+import 'package:sentinela/data/services/logger/logger.dart';
+import 'package:sentinela/exceptions/app_exception.dart';
+import 'package:sentinela/utils/result.dart';
 
 final class LocalSecureStorageImpl implements LocalSecureStorage {
   final FlutterSecureStorage _storage;

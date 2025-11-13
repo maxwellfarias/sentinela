@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:w3_diploma/main.dart';
+import 'package:sentinela/main.dart';
 
 
 void main() {

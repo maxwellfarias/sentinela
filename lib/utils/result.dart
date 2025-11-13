@@ -72,8 +72,9 @@
 // =============================================================================
 
 
-import 'package:w3_diploma/exceptions/app_exception.dart';
-import 'package:w3_diploma/utils/app_logger.dart';
+
+
+import 'package:sentinela/exceptions/app_exception.dart';
 
 /// 🎯 **Result Pattern** - Classe base para operações que podem falhar
 /// 

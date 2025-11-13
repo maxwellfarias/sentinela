@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:sentinela/data/services/auth_client/auth_api_client.dart';
-import 'package:sentinela/data/services/http/endpoint_builder/endpoint_builder_impl.dart';
+import 'package:sentinela/data/model/login_response_api_model.dart';
+import 'package:sentinela/data/services/api/auth_client/auth_api_client.dart';
+import 'package:sentinela/data/services/api/endpoint_builder/endpoint_builder_impl.dart';
 import 'package:sentinela/data/services/local/local_secure_storage/local_secure_storage.dart';
 import 'package:sentinela/data/services/logger/logger.dart';
 import 'package:sentinela/exceptions/app_exception.dart';
@@ -24,8 +25,6 @@ class AuthApiClientImpl implements AuthApiClient {
         _connectionChecker = connectionChecker,
         _storage = storage,
         _logger = logger;
-        
-          get LoginResponseModel => null;
 
   @override
   Future<Result<dynamic>> loginWithEmailPassword({
@@ -57,7 +56,7 @@ class AuthApiClientImpl implements AuthApiClient {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final loginResponse = LoginResponseModel.fromJson(response.data);
+        final loginResponse = LoginResponseApiModel.fromJson(response.data);
         _logger.info('User logged in: ${loginResponse.user.id}', tag: _logTag);
         return Result.ok(loginResponse);
       }
@@ -109,7 +108,7 @@ class AuthApiClientImpl implements AuthApiClient {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final signUpResponse = LoginResponseModel.fromJson(response.data);
+        final signUpResponse = LoginResponseApiModel.fromJson(response.data);
         _logger.info('User signed up: ${signUpResponse.user.id}', tag: _logTag);
         return Result.ok(signUpResponse);
       }
@@ -198,7 +197,7 @@ class AuthApiClientImpl implements AuthApiClient {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final refreshResponse = LoginResponseModel.fromJson(response.data);
+        final refreshResponse = LoginResponseApiModel.fromJson(response.data);
         _logger.info('Token refreshed successfully', tag: _logTag);
         return Result.ok(refreshResponse);
       }
@@ -257,4 +256,3 @@ class AuthApiClientImpl implements AuthApiClient {
     }
   }
 }
-

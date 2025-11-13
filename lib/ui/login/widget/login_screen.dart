@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:w3_diploma/ui/core/extensions/build_context_extension.dart';
-import 'package:w3_diploma/ui/login/widget/viewmodel/login_viewmodel.dart';
+import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
+import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
+
 
 /// Tela de login profissional do W3Diploma
 ///
