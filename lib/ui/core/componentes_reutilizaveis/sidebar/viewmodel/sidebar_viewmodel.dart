@@ -1,8 +1,9 @@
 import 'package:flutter/widgets.dart';
-import 'package:w3_diploma/data/repositories/auth/auth_repository.dart';
-import 'package:w3_diploma/domain/models/auth/user_model.dart';
-import 'package:w3_diploma/utils/command.dart';
-import 'package:w3_diploma/utils/result.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/domain/models/aluno/user_model.dart';
+import 'package:sentinela/utils/command.dart';
+import 'package:sentinela/utils/result.dart';
+
 
 final class SidebarViewModel extends ChangeNotifier {
   final AuthRepository _authRepository;
@@ -16,7 +17,7 @@ final class SidebarViewModel extends ChangeNotifier {
   late final Command0<void> logout;
 
   /// Obtém o usuário atual
-  UserModel? get user => _authRepository.currentUser;
+  Future<Result<UserModel>> get user async => await _authRepository.currentUser();
 
   /// Realiza logout do usuário
   Future<Result<void>> _logout() async {

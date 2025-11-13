@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:w3_diploma/ui/core/themes/custom_text_style.dart';
-import 'package:w3_diploma/ui/core/themes/dimens.dart';
-import 'package:w3_diploma/ui/core/extensions/new_color_extension.dart';
+import 'package:sentinela/ui/core/extensions/new_color_extension.dart';
+import 'package:sentinela/ui/core/themes/custom_text_style.dart';
+import 'package:sentinela/ui/core/themes/dimens.dart';
 
 extension CustomTextThemeContextExtension on BuildContext {
   TextTheme get textTheme => Theme.of(this).textTheme; 

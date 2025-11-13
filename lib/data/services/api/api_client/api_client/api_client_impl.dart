@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:sentinela/config/constants/http_types.dart';
 import 'package:sentinela/data/services/api/api_client/api_client/api_client.dart';
+import 'package:sentinela/data/services/api/header_builder/header_builder.dart';
 import 'package:sentinela/data/services/logger/logger.dart';
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/network/connection_checker.dart';
@@ -179,5 +180,3 @@ final class ApiClientImpl implements ApiClient {
   }
 }
 
-class HeaderBuilder {
-}

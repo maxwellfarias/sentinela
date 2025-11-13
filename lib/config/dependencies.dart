@@ -2,21 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:w3_diploma/data/repositories/auth/auth_repository.dart';
-import 'package:w3_diploma/data/repositories/auth/auth_repository_impl.dart';
 
-import 'package:w3_diploma/data/repositories/endereco/endereco_repository.dart';
-import 'package:w3_diploma/data/repositories/endereco/endereco_repository_impl.dart';
-
-import 'package:w3_diploma/data/repositories/ies_registradora/ies_registradora_repository.dart';
-import 'package:w3_diploma/data/repositories/ies_registradora/ies_registradora_repository_impl.dart';
-
-import 'package:w3_diploma/data/services/api_client/api_client/api_client.dart';
-import 'package:w3_diploma/data/services/api_client/api_client/api_client_impl.dart';
-import 'package:w3_diploma/data/services/auth_service/auth_api_client.dart';
-import 'package:w3_diploma/data/services/auth_service/auth_api_client_impl.dart';
-import 'package:w3_diploma/data/services/auth_service/auth_interceptor.dart';
-import 'package:w3_diploma/data/services/auth_service/secure_storage_service.dart';
 
 List<SingleChildWidget> get providers {
   return [

@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:w3_diploma/data/repositories/auth/auth_repository.dart';
-import 'package:w3_diploma/routing/routes.dart';
-import 'package:w3_diploma/ui/core/componentes_reutilizaveis/sidebar/viewmodel/sidebar_viewmodel.dart';
-import 'package:w3_diploma/ui/core/componentes_reutilizaveis/sidebar/widgets/sidebar.dart';
-
-// import 'package:w3_diploma/ui/curso_screen/viewmodel/curso_viewmodel.dart';
-// import 'package:w3_diploma/ui/curso_screen/widget/curso_screen.dart';
-// import 'package:w3_diploma/ui/disciplina_screen/viewmodel/disciplina_viewmodel.dart';
-// import 'package:w3_diploma/ui/disciplina_screen/widget/disciplina_screen.dart';
-
-import 'package:w3_diploma/ui/core/componentes_reutilizaveis/resposive_layout.dart';
-
-import 'package:w3_diploma/ui/login/widget/login_screen.dart';
-import 'package:w3_diploma/ui/login/widget/viewmodel/login_viewmodel.dart';
-import 'package:w3_diploma/ui/p1_screen/widget/p1_screen.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/routing/routes.dart';
+import 'package:sentinela/ui/core/componentes_reutilizaveis/resposive_layout.dart';
+import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/viewmodel/sidebar_viewmodel.dart';
+import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/widgets/sidebar.dart';
+import 'package:sentinela/ui/login/widget/login_screen.dart';
+import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
+import 'package:sentinela/ui/p1_screen/widget/p1_screen.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _mainShellNavigatorKey = GlobalKey<NavigatorState>();
@@ -27,7 +20,7 @@ GoRouter router(AuthRepository authRepository) => GoRouter(
   initialLocation: Routes.p1,
   debugLogDiagnostics: true,
   redirect: (context, state) async {
-    final loggedIn = await authRepository.isAuthenticated;
+    final loggedIn = await authRepository.isAuthenticated();
     final loggingIn = state.matchedLocation == Routes.login;
 
     // Se não estiver autenticado e não estiver na tela de login, redireciona para login

@@ -1,289 +1,164 @@
-import 'package:w3_diploma/data/services/auth_service/auth_api_client.dart';
 
-import '../../../domain/models/auth/login_request.dart';
-import '../../../domain/models/auth/refresh_token_request.dart';
-import '../../../domain/models/auth/user_model.dart';
-import '../../../exceptions/app_exception.dart';
-import '../../../utils/app_logger.dart';
-import '../../../utils/result.dart';
-import '../../services/auth_service/auth_api_client_impl.dart';
-import '../../services/auth_service/secure_storage_service.dart';
-import 'auth_repository.dart';
+import 'package:sentinela/data/model/login_response_api_model.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/data/services/api/auth_client/auth_api_client.dart';
+import 'package:sentinela/data/services/api/auth_client/auth_api_client_impl.dart';
+import 'package:sentinela/data/services/local/local_secure_storage/local_secure_storage.dart';
+import 'package:sentinela/data/services/logger/logger.dart';
+import 'package:sentinela/domain/models/aluno/user_model.dart';
+import 'package:sentinela/exceptions/app_exception.dart';
+import 'package:sentinela/utils/network/connection_checker.dart';
+import 'package:sentinela/utils/result.dart';
 
-class AuthRepositoryImpl extends AuthRepository {
+final class AuthRepositoryImpl extends AuthRepository {
   final AuthApiClient _authApiClient;
-  final SecureStorageService _secureStorageService;
-
+  final LocalSecureStorage _storage;
+  final Logger _logger;
   static const String _logTag = 'AuthRepository';
 
-  bool? _isAuthenticated;
-  String? _authToken;
-  UserModel? _currentUser;
-
   AuthRepositoryImpl({
-    required AuthApiClient authApiClient,
-    required SecureStorageService secureStorageService,
-  })  : _authApiClient = authApiClient,
-        _secureStorageService = secureStorageService {
-    _initialize();
-  }
-
-  /// Inicializa o repositório carregando o token armazenado
-  Future<void> _initialize() async {
-    await _loadStoredToken();
-  }
-
-  /// Carrega o token armazenado do secure storage
-  Future<void> _loadStoredToken() async {
-    final result = await _secureStorageService.getToken();
-    switch (result) {
-      case Ok<String?>():
-        _authToken = result.value;
-        _isAuthenticated = result.value != null;
-        AppLogger.info(
-          'Token carregado: ${_authToken != null ? "Presente" : "Ausente"}',
-          tag: _logTag,
-        );
-      case Error<String?>():
-        AppLogger.error(
-          'Erro ao carregar token: ${result.error}',
-          tag: _logTag,
-          error: result.error,
-        );
-        _isAuthenticated = false;
-    }
-  }
+    required AuthApiClient apiClient,
+    required ConnectionChecker connectionChecker,
+    required LocalSecureStorage storage,
+    required Logger logger,
+  })  : _authApiClient = apiClient,
+        _storage = storage,
+        _logger = logger;
 
   @override
-  Future<bool> get isAuthenticated async {
-    // Status já foi carregado
-    if (_isAuthenticated != null) {
-      return _isAuthenticated!;
-    }
-
-    // Ainda não carregou, tenta carregar do storage
-    await _loadStoredToken();
-    return _isAuthenticated ?? false;
-  }
-
-  @override
-  Future<Result<void>> login({
-    required String cpf,
-    required String password,
-  }) async {
+  Future<Result<UserModel>> currentUser() async {
     try {
-      AppLogger.info('Tentando fazer login com CPF: $cpf', tag: _logTag);
-
-      final loginRequest = LoginRequest(
-        cpf: cpf,
-        password: password,
-      );
-
-      final result = await _authApiClient.login(loginRequest);
-
-      switch (result) {
-        case Ok():
-          final loginResponse = result.value;
-          AppLogger.info('Login bem-sucedido', tag: _logTag);
-
-          // Armazena o token JWT
-          _authToken = loginResponse.token;
-          await _secureStorageService.saveToken(loginResponse.token);
-
-          // Armazena o refresh token
-          await _secureStorageService.saveRefreshToken(loginResponse.refreshToken);
-
-          // Armazena a data de expiração
-          await _secureStorageService.saveTokenExpires(loginResponse.expires);
-
-          // Armazena informações do usuário
-          await _secureStorageService.saveUserId(loginResponse.id.toString());
-          await _secureStorageService.saveUsername(loginResponse.username);
-          await _secureStorageService.saveUserRole(loginResponse.role);
-          await _secureStorageService.saveNumeroBancoDados(loginResponse.numeroBancoDados);
-
-          // Cria um UserModel simplificado (compatível com o modelo antigo)
-          // Nota: A API não retorna mais um objeto 'user', mas campos diretos
-          _currentUser = UserModel(
-            id: loginResponse.id.toString(),
-            nome: loginResponse.username,
-            cpf: cpf, // Usa o CPF fornecido no login
-            email: null, // A API não retorna email
-          );
-
-          // Atualiza o status de autenticação
-          _isAuthenticated = true;
-
-          // Notifica os listeners
-          notifyListeners();
-
-          AppLogger.info(
-            'Dados do usuário salvos: ID=${loginResponse.id}, Role=${loginResponse.role}',
-            tag: _logTag,
-          );
-
-          return const Result.ok(null);
-
-        case Error():
-          AppLogger.warning('Erro no login: ${result.error}', tag: _logTag);
-          _isAuthenticated = false;
-          return Result.error(result.error);
-      }
-    } catch (e) {
-      AppLogger.error('Erro inesperado no login: $e', tag: _logTag, error: e);
-      _isAuthenticated = false;
-      return Result.error(UnknownErrorException());
-    }
-  }
-
-  @override
-  Future<Result<void>> refreshToken() async {
-    try {
-      AppLogger.info('Renovando token', tag: _logTag);
-
-      // Obtém o token e refresh token atuais
-      final tokenResult = await _secureStorageService.getToken();
-      final refreshTokenResult = await _secureStorageService.getRefreshToken();
-
-      final token = tokenResult.getSuccessOrNull();
-      final refreshToken = refreshTokenResult.getSuccessOrNull();
-
-      if (token == null || refreshToken == null) {
-        AppLogger.error('Token ou refresh token não disponível', tag: _logTag);
+  
+      // Check if user is authenticated
+      final isAuth = await isAuthenticated();
+      if (!isAuth) {
         return Result.error(SessaoExpiradaException());
       }
 
-      // Cria a requisição de refresh
-      final refreshRequest = RefreshTokenRequest(
-        token: token,
-        refreshToken: refreshToken,
-      );
-
-      // Chama a API para renovar o token
-      final result = await _authApiClient.refreshToken(refreshRequest);
-
-      switch (result) {
-        case Ok():
-          final refreshResponse = result.value;
-          AppLogger.info('Refresh token bem-sucedido', tag: _logTag);
-
-          // Atualiza o token JWT em memória
-          _authToken = refreshResponse.token;
-
-          // Salva os novos tokens e informações
-          await _secureStorageService.saveToken(refreshResponse.token);
-          await _secureStorageService.saveRefreshToken(refreshResponse.refreshToken);
-          await _secureStorageService.saveTokenExpires(refreshResponse.expires);
-          await _secureStorageService.saveUsername(refreshResponse.username);
-          await _secureStorageService.saveUserRole(refreshResponse.role);
-          await _secureStorageService.saveNumeroBancoDados(refreshResponse.numeroBancoDados);
-          await _secureStorageService.saveUserId(refreshResponse.id.toString());
-
-          // Atualiza o usuário em memória se necessário
-          if (_currentUser != null) {
-            _currentUser = UserModel(
-              id: refreshResponse.id.toString(),
-              nome: refreshResponse.username,
-              cpf: _currentUser!.cpf, // Mantém o CPF original
-              email: _currentUser!.email, // Mantém o email original
-            );
-          }
-
-          // Mantém o status de autenticação
-          _isAuthenticated = true;
-
-          // Notifica os listeners
-          notifyListeners();
-
-          AppLogger.info('Token renovado com sucesso', tag: _logTag);
-          return const Result.ok(null);
-
-        case Error():
-          AppLogger.error('Erro ao renovar token: ${result.error}', tag: _logTag);
-          // Se o refresh falhou, o usuário precisa fazer login novamente
-          _isAuthenticated = false;
-          notifyListeners();
-          return Result.error(result.error);
-      }
-    } catch (e) {
-      AppLogger.error('Erro inesperado ao renovar token: $e', tag: _logTag, error: e);
-      _isAuthenticated = false;
-      notifyListeners();
+      // Get current user data from API
+      return await _authApiClient.getCurrentUserData().map((userData) {
+        if (userData == null) {
+          throw Exception('No user data returned');
+        }
+        return UserModel.fromJson(userData);
+      });
+    } catch (e, s) {
+      _logger.error('Error getting current user', error: e, stackTrace: s, tag: _logTag);
       return Result.error(UnknownErrorException());
+    }
+  }
+
+  @override
+  Future<Result<dynamic>> loginWithEmailPassword({required String email, required String password}) async {
+    try {
+      return await _authApiClient.loginWithEmailPassword(email: email, password: password)
+          .flatMapAsync((response) async {
+        // Response is already a LoginResponseModel from AuthApiClient
+        final loginModel = response as LoginResponseApiModel;
+
+        // Calculate expires_at from expires_in if not provided
+        final expiresAt = loginModel.expiresAt != 0
+            ? loginModel.expiresAt
+            : (DateTime.now().millisecondsSinceEpoch ~/ 1000) + loginModel.expiresIn;
+
+        // Save bearer token, refresh token, and expiration time to secure storage
+        await _storage.write(key: 'bearer_token', value: loginModel.accessToken);
+        await _storage.write(key: 'refresh_token', value: loginModel.refreshToken);
+        await _storage.write(key: 'token_expires_at', value: expiresAt.toString());
+
+        _logger.info('Tokens saved successfully', tag: _logTag);
+
+        return Result.ok(loginModel);
+      });
+    } catch (e, s) {
+      _logger.error('Error loginWithEmailPassword', error: e, stackTrace: s, tag: _logTag);
+      return Result.error(UnknownErrorException());
+    } finally {
+      // Notify listeners that authentication state may have changed
+      notifyListeners();
+    }
+  }
+
+  @override
+  Future<Result> signUpWithEmailPassword({
+    required String name,
+    required String email,
+    required String password,
+  }) {
+    // TODO: implement signUpWithEmailPassword
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isAuthenticated() async {
+    try {
+      // Read token expiration time from secure storage
+      final expiresAtResult = await _storage.read(key: 'token_expires_at');
+      final tokenResult = await _storage.read(key: 'bearer_token');
+
+      // If either token or expiration time doesn't exist, user is not authenticated
+      final expiresAtString = expiresAtResult.getSuccessOrNull();
+      final token = tokenResult.getSuccessOrNull();
+
+      if (expiresAtString == null || token == null) {
+        _logger.info('No token or expiration time found', tag: _logTag);
+        return false;
+      }
+
+      // Parse expiration time
+      final expiresAt = int.tryParse(expiresAtString);
+      if (expiresAt == null) {
+        _logger.error('Invalid expiration time format', tag: _logTag);
+        return false;
+      }
+
+      // Check if token is still valid (compare with current timestamp)
+      final currentTimestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      final isValid = currentTimestamp < expiresAt;
+
+      if (!isValid) {
+        _logger.info('Token has expired', tag: _logTag);
+      }
+
+      return isValid;
+    } catch (e, s) {
+      _logger.error('Error checking authentication', error: e, stackTrace: s, tag: _logTag);
+      return false;
     }
   }
 
   @override
   Future<Result<void>> logout() async {
     try {
-      AppLogger.info('Fazendo logout', tag: _logTag);
+      // Get the current token to send in logout request
+      final tokenResult = await _storage.read(key: 'bearer_token');
+      final token = tokenResult.getSuccessOrNull();
 
-      // Tenta fazer logout no servidor se houver token
-      if (_authToken != null) {
-        await _authApiClient.logout(_authToken!);
+      // Call logout API if we have a token
+      if (token != null && token.isNotEmpty) {
+        if (_authApiClient case AuthApiClientImpl apiClient) {
+          await apiClient.logout(token: token);
+        }
       }
 
-      // Limpa os dados armazenados
-      final clearResult = await _secureStorageService.clearAll();
+      // Clear all authentication data from secure storage
+      await _storage.delete(key: 'bearer_token');
+      await _storage.delete(key: 'refresh_token');
+      await _storage.delete(key: 'token_expires_at');
 
-      if (clearResult is Error) {
-        AppLogger.error(
-          'Erro ao limpar dados: ${clearResult.error}',
-          tag: _logTag,
-          error: clearResult.error,
-        );
-      }
+      _logger.info('User logged out successfully', tag: _logTag);
 
-      // Limpa o estado local
-      _authToken = null;
-      _currentUser = null;
-      _isAuthenticated = false;
-
-      // Notifica os listeners
-      notifyListeners();
-
-      AppLogger.info('Logout concluído', tag: _logTag);
-      return const Result.ok(null);
-    } catch (e) {
-      AppLogger.error('Erro inesperado no logout: $e', tag: _logTag, error: e);
+      return Result.ok(null);
+    } catch (e, s) {
+      _logger.error('Error during logout', error: e, stackTrace: s, tag: _logTag);
+      // Even if API call fails, clear local tokens
+      await _storage.delete(key: 'bearer_token');
+      await _storage.delete(key: 'refresh_token');
+      await _storage.delete(key: 'token_expires_at');
       return Result.error(UnknownErrorException());
+    } finally {
+      // Notify listeners that authentication state has changed
+      notifyListeners();
     }
-  }
-
-  @override
-  UserModel? get currentUser => _currentUser;
-
-  @override
-  Future<String?> get currentToken async {
-    if (_authToken != null) {
-      return _authToken;
-    }
-
-    // Tenta carregar do storage
-    final result = await _secureStorageService.getToken();
-    if (result is Ok<String?>) {
-      _authToken = result.value;
-      return result.value;
-    }
-
-    return null;
-  }
-
-  @override
-  Future<String?> get currentRefreshToken async {
-    final result = await _secureStorageService.getRefreshToken();
-    return result.getSuccessOrNull();
-  }
-
-  @override
-  Future<String?> get currentUserRole async {
-    final result = await _secureStorageService.getUserRole();
-    return result.getSuccessOrNull();
-  }
-
-  @override
-  Future<int?> get currentNumeroBancoDados async {
-    final result = await _secureStorageService.getNumeroBancoDados();
-    return result.getSuccessOrNull();
   }
 }

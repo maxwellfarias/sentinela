@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:w3_diploma/ui/core/themes/colors.dart';
+import 'package:sentinela/ui/core/themes/colors.dart';
 
 class AppColorTheme extends ThemeExtension<AppColorTheme> {
   final Color sidebarBackgroundColor;
