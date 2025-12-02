@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sentinela/config/dependencies.dart';
-import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 import 'package:sentinela/routing/router.dart';
 import 'package:sentinela/ui/core/themes/theme.dart';
 
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authRepository = context.read<AuthRepository>();
+    // final authRepository = context.read<AuthRepository>();
 
     return MaterialApp.router(
       title: 'Flutter Demo',
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,
-      routerConfig: router(authRepository),
+      routerConfig: router(),
     );
   }
 }

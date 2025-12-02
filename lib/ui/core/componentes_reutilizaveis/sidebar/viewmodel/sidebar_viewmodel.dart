@@ -6,10 +6,10 @@ import 'package:sentinela/utils/result.dart';
 
 
 final class SidebarViewModel extends ChangeNotifier {
-  final AuthRepository _authRepository;
+  // final AuthRepository _authRepository;
 
-  SidebarViewModel({required AuthRepository authRepository})
-      : _authRepository = authRepository {
+  SidebarViewModel()
+      {
     logout = Command0(_logout);
   }
 
@@ -17,13 +17,13 @@ final class SidebarViewModel extends ChangeNotifier {
   late final Command0<void> logout;
 
   /// Obtém o usuário atual
-  Future<Result<UserModel>> get user async => await _authRepository.currentUser();
+  Future<UserModel> get user async => UserModel(aud: '', id: '', role: '', email: '', phone: '', isAnonymous: true);
 
   /// Realiza logout do usuário
   Future<Result<void>> _logout() async {
-    final result = await _authRepository.logout();
+    final result = UserModel(aud: '', id: '', role: '', email: '', phone: '', isAnonymous: true);
     notifyListeners();
-    return result;
+    return Result.ok(null);
   }
 
   @override
