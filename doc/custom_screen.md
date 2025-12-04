@@ -548,6 +548,79 @@ Componentes com menos de 30 linhas devem permanecer na screen principal.
 | Fundo de inputs | `context.colorTheme.bgNeutralPrimary` |
 | Foco/seleção | `context.colorTheme.borderBrandLight` |
 
+### **🔍 MAPEAMENTO DE CORES - REGRAS OBRIGATÓRIAS**
+
+#### **1️⃣ Análise de Contexto para Cores**
+
+Quando estiver criando um componente que utilize a cor exata ou aproximada de uma das cores listadas na classe `FlowbiteColors`, **DEVE ser analisado o contexto** e utilizada a cor semântica adequada.
+
+**Exemplo prático:**
+Se um componente utiliza a cor `#E1EFFE` (azul claro) no tema claro, deve ser verificado quem utiliza essa cor na classe `FlowbiteColors`:
+
+```dart
+// Em FlowbiteColors:
+static const blue100 = Color(0xFFE1EFFE);
+static const bgBrandSoft = blue100;  // ← Esta é a variável semântica
+```
+
+**Portanto, no código deve-se usar:**
+```dart
+// ✅ CORRETO
+Container(color: context.colorTheme.bgBrandSoft)
+
+// ❌ ERRADO
+Container(color: Color(0xFFE1EFFE))
+Container(color: FlowbiteColors.blue100)
+```
+
+#### **2️⃣ Cores com Múltiplas Propriedades**
+
+Quando uma mesma cor base é usada por mais de uma propriedade semântica, **o contexto de uso define qual propriedade usar**:
+
+```dart
+// Em FlowbiteColors - todas apontam para `white`:
+static const bgNeutralPrimarySoft = white;
+static const bgNeutralPrimary = white;
+static const bgNeutralPrimaryMedium = white;
+static const bgNeutralPrimaryStrong = white;
+```
+
+**Regra de escolha:**
+- `bgNeutralPrimarySoft` → Fundos sutis, backgrounds leves
+- `bgNeutralPrimary` → Fundos padrão de cards, containers
+- `bgNeutralPrimaryMedium` → Fundos com destaque médio
+- `bgNeutralPrimaryStrong` → Fundos com destaque forte
+
+**Exemplo de análise contextual:**
+```dart
+// Para um card principal:
+Card(color: context.colorTheme.bgNeutralPrimary)
+
+// Para um fundo sutil de seção:
+Container(color: context.colorTheme.bgNeutralPrimarySoft)
+```
+
+#### **3️⃣ Acesso Obrigatório via context.colorTheme**
+
+**TODAS as cores do aplicativo DEVEM ser acessadas seguindo o padrão:**
+
+```dart
+context.colorTheme.corASerUsada
+```
+
+**Motivo:** Isso garante que as cores mudem automaticamente quando houver troca de tema (light/dark mode), pois a classe `CustomColorTheme` possui valores diferentes para cada tema.
+
+**Exemplo de como funciona:**
+```dart
+// Tema Claro - bgBrandSoft retorna blue100 (#E1EFFE)
+// Tema Escuro - bgBrandSoft retorna blue900 (tom escuro correspondente)
+
+// Código único que funciona em ambos os temas:
+Container(color: context.colorTheme.bgBrandSoft)
+```
+
+---
+
 ### **🚫 CONVERSÕES PROIBIDAS**
 
 ❌ **NÃO usar**:
@@ -555,6 +628,7 @@ Componentes com menos de 30 linhas devem permanecer na screen principal.
 - `Colors.red`, `Colors.blue`, `Colors.green`, etc.
 - `context.colorScheme.*`
 - Cores hardcoded como `Color(0xFF...)`
+- Acesso direto a `FlowbiteColors.*` (exceto para referência)
 
 ✅ **SEMPRE usar**:
 - `context.customTextTheme.*`

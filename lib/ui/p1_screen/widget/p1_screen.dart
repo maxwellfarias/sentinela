@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
 import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
 import 'componentes/breadcrumb.dart';
+import 'componentes/filters_modal.dart';
 import 'componentes/user_model_mock.dart';
 import 'componentes/users_filter_bar.dart';
 import 'componentes/users_table.dart';
@@ -95,7 +96,7 @@ class _P1ScreenState extends State<P1Screen> {
   }
 
   void _onAddNewUser() {
-    _showSnackBar('Adicionar novo usuário');
+    FiltersModal.show(context);
   }
 
   void _onDownloadCSV() {
