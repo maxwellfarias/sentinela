@@ -165,7 +165,7 @@ abstract final class AppTheme {
       }),
     ),
 
-    extensions: [NewAppColorTheme(), FlowbiteColorTheme()],
+    extensions: [NewAppColorTheme(), CustomColorTheme()],
   );
 
   //MARK: ThemeData Dark
@@ -395,7 +395,7 @@ abstract final class AppTheme {
         utilitySuccess200: AppColors.success200,
         utilityError200: AppColors.error800,
       ),
-      FlowbiteColorTheme(
+      CustomColorTheme(
         // Foreground Colors - Dark Mode
         fgBody: FlowbiteColors.fgBodyDark,
         fgBodySubtle: FlowbiteColors.fgBodySubtleDark,

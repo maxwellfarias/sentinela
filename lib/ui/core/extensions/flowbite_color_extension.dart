@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
 
-class FlowbiteColorTheme extends ThemeExtension<FlowbiteColorTheme> {
+class CustomColorTheme extends ThemeExtension<CustomColorTheme> {
   // ============================================
   // 🔤 SEMANTIC TEXT COLORS (Foreground)
   // ============================================
@@ -107,7 +107,7 @@ class FlowbiteColorTheme extends ThemeExtension<FlowbiteColorTheme> {
   final Color borderDarkSubtle;
   final Color borderDarkBackdrop;
 
-  const FlowbiteColorTheme({
+  const CustomColorTheme({
     // Foreground Colors - Light Mode defaults
     this.fgBody = FlowbiteColors.fgBody,
     this.fgBodySubtle = FlowbiteColors.fgBodySubtle,
@@ -208,7 +208,7 @@ class FlowbiteColorTheme extends ThemeExtension<FlowbiteColorTheme> {
   });
 
   @override
-  ThemeExtension<FlowbiteColorTheme> copyWith({
+  ThemeExtension<CustomColorTheme> copyWith({
     // Foreground Colors
     Color? fgBody,
     Color? fgBodySubtle,
@@ -306,7 +306,7 @@ class FlowbiteColorTheme extends ThemeExtension<FlowbiteColorTheme> {
     Color? borderDarkSubtle,
     Color? borderDarkBackdrop,
   }) {
-    return FlowbiteColorTheme(
+    return CustomColorTheme(
       // Foreground Colors
       fgBody: fgBody ?? this.fgBody,
       fgBodySubtle: fgBodySubtle ?? this.fgBodySubtle,
@@ -416,14 +416,14 @@ class FlowbiteColorTheme extends ThemeExtension<FlowbiteColorTheme> {
   }
 
   @override
-  ThemeExtension<FlowbiteColorTheme> lerp(
-    covariant ThemeExtension<FlowbiteColorTheme>? other,
+  ThemeExtension<CustomColorTheme> lerp(
+    covariant ThemeExtension<CustomColorTheme>? other,
     double t,
   ) {
-    if (other is! FlowbiteColorTheme) {
+    if (other is! CustomColorTheme) {
       return this;
     }
-    return FlowbiteColorTheme(
+    return CustomColorTheme(
       // Foreground Colors
       fgBody: Color.lerp(fgBody, other.fgBody, t) ?? fgBody,
       fgBodySubtle:
