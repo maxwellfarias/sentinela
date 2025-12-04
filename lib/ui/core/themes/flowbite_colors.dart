@@ -324,7 +324,7 @@ abstract final class FlowbiteColors {
   static const bgBrandSoftDark = blue900;
   static const bgBrandDark = blue600;
   static const bgBrandMediumDark = blue800;
-  static const bgBrandStrongDark = blue500;
+  static const bgBrandStrongDark = blue300;
 
   // Dark Mode - Status Background Colors
   static const bgSuccessSoftDark = emerald950;

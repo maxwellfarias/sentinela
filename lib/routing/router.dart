@@ -5,7 +5,6 @@ import 'package:sentinela/routing/routes.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/resposive_layout.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/viewmodel/sidebar_viewmodel.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/widgets/sidebar.dart';
-import 'package:sentinela/ui/p1_screen/viewmodel/event_viewmodel.dart';
 import 'package:sentinela/ui/p1_screen/widget/p1_screen.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
@@ -53,22 +52,10 @@ GoRouter router() => GoRouter(
         );
       },
       routes: [
-        GoRoute(path: Routes.p1, builder: (context, state) => P1Screen(viewModel: EventViewModel(),)),
+        GoRoute(path: Routes.p1, builder: (context, state) => P1Screen()),
       ],
     ),
 
-    // GoRoute(
-    //   path: Routes.login,
-    //   builder: (context, state) => LoginScreen(viewModel: context.read())
-    // ),
-    // GoRoute(
-    //   path: Routes.signup,
-    //   builder:
-    //       (context, state) => Scaffold(
-    //         appBar: AppBar(title: SelectableText("signup")),
-    //         body: Center(child: SelectableText("My signup")),
-    //       ),
-    // ),
     GoRoute(
       path: Routes.login,
       builder: (context, state) => Container(),

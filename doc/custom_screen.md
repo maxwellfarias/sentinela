@@ -236,6 +236,7 @@ import 'package:w3_diploma/domain/models/task_model.dart';
 import 'package:w3_diploma/ui/todo/viewmodel/task_viewmodel.dart';
 import 'package:w3_diploma/utils/command.dart';
 import 'package:w3_diploma/ui/core/extensions/build_context_extension.dart';
+import 'package:w3_diploma/ui/core/themes/flowbite_colors.dart';
 
 final class TodoListScreen extends StatefulWidget {
   final TaskViewModel viewModel;
@@ -273,14 +274,14 @@ class _TodoListScreenState extends State<TodoListScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erro: ${command.errorMessage ?? 'Ocorreu um erro desconhecido.'}'),
-          backgroundColor: context.colorTheme.destructive,
+          backgroundColor: context.colorTheme.bgDanger,
         ),
       );
     } else if (command.completed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(successMessage),
-          backgroundColor: context.colorTheme.success,
+          backgroundColor: context.colorTheme.bgSuccess,
         ),
       );
     }
@@ -317,7 +318,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 child: Text(
                   'Erro ao carregar tarefas: ${widget.viewModel.getAllTasks.errorMessage}',
                   style: context.customTextTheme.textBase.copyWith(
-                    color: context.colorTheme.destructive,
+                    color: context.colorTheme.fgDanger,
                   ),
                 ),
               ),
@@ -330,7 +331,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
               child: Text(
                 'Nenhuma tarefa encontrada',
                 style: context.customTextTheme.textLgMedium.copyWith(
-                  color: context.colorTheme.mutedForeground,
+                  color: context.colorTheme.fgBodySubtle,
                 ),
               ),
             );
@@ -343,7 +344,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
               final task = widget.viewModel.tasks[index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                color: context.colorTheme.card,
+                color: context.colorTheme.bgNeutralPrimary,
                 child: ListTile(
                   leading: Checkbox(
                     value: task.isCompleted,
@@ -352,14 +353,14 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   title: Text(
                     task.title,
                     style: context.customTextTheme.textBaseMedium.copyWith(
-                      color: context.colorTheme.cardForeground,
+                      color: context.colorTheme.fgHeading,
                       decoration: task.isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
                     ),
                   ),
                   subtitle: Text(
                     task.description,
                     style: context.customTextTheme.textSm.copyWith(
-                      color: context.colorTheme.mutedForeground,
+                      color: context.colorTheme.fgBodySubtle,
                     ),
                   ),
                   trailing: Row(
@@ -368,14 +369,14 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       IconButton(
                         icon: Icon(
                           Icons.edit,
-                          color: context.colorTheme.primary,
+                          color: context.colorTheme.bgBrand,
                         ),
                         onPressed: () => _editTask(task),
                       ),
                       IconButton(
                         icon: Icon(
                           Icons.delete,
-                          color: context.colorTheme.destructive,
+                          color: context.colorTheme.fgDanger,
                         ),
                         onPressed: () => _deleteTask(task.id),
                       ),
@@ -390,8 +391,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createNewTask,
-        backgroundColor: context.colorTheme.primary,
-        foregroundColor: context.colorTheme.primaryForeground,
+        backgroundColor: context.colorTheme.bgBrand,
+        foregroundColor: FlowbiteColors.white,
         child: const Icon(Icons.add),
       ),
     );
@@ -419,143 +420,6 @@ class _TodoListScreenState extends State<TodoListScreen> {
   }
 }
 ```
-
----
-
-## 🧩 **COMPONENTES REUTILIZÁVEIS**
-
-**Path**: `/lib/ui/core/componentes_reutilizaveis/`
-
-**⚠️ IMPORTANTE**: Sempre que precisar criar um componente que poderia ser reutilizado em outras telas, **crie-o na pasta de componentes reutilizáveis** e **atualize esta documentação** informando o novo componente.
-
-### **Componentes Disponíveis:**
-
-#### **1. CepTextField**
-Campo de texto para CEP com máscara automática e busca de endereço via API.
-
-**Uso:**
-```dart
-import 'package:w3_diploma/ui/core/componentes_reutilizaveis/cep_text_field.dart';
-
-CepTextField(
-  controller: _cepController,
-  buscarCep: viewModel.buscarEndereco,
-  isRequired: true,
-  comLabelExterna: false,
-  onBuscaIniciada: () {
-    // Callback quando a busca é iniciada
-  },
-)
-```
-
-**Características:**
-- Máscara automática `#####-###`
-- Busca automática quando CEP completo (8 dígitos)
-- Indicador de loading durante busca
-- Validação de formato
-- Suporte a label externa ou interna
-
----
-
-#### **2. CustomDatePicker**
-Seletor de data customizado com validação.
-
-**Uso:**
-```dart
-import 'package:w3_diploma/ui/core/componentes_reutilizaveis/custom_datepicker_field.dart';
-
-CustomDatePicker(
-  label: 'Data de Nascimento *',
-  value: _dataNascimento,
-  onDateSelected: (date) {
-    setState(() {
-      _dataNascimento = date;
-    });
-  },
-  isRequired: true,
-)
-```
-
-**Características:**
-- Interface nativa do Flutter
-- Formato `dd/MM/yyyy`
-- Validação de campo obrigatório
-- Range de datas configurável (1900-2100)
-- Estilização customizada
-
----
-
-#### **3. CustomDropdown**
-Dropdown simples sem busca.
-
-**Uso:**
-```dart
-import 'package:w3_diploma/ui/core/componentes_reutilizaveis/custom_dropdown.dart';
-
-CustomDropdown<String>(
-  label: 'Estado *',
-  valorInicial: _estadoSelecionado,
-  itens: [
-    DropdownMenuItem(value: 'SP', child: Text('São Paulo')),
-    DropdownMenuItem(value: 'RJ', child: Text('Rio de Janeiro')),
-    DropdownMenuItem(value: 'MG', child: Text('Minas Gerais')),
-  ],
-  aoSelecionar: (valor) {
-    setState(() {
-      _estadoSelecionado = valor;
-    });
-  },
-  validador: (value) {
-    if (value == null) return 'Este campo é obrigatório';
-    return null;
-  },
-)
-```
-
-**Características:**
-- Genérico (`T`)
-- Validação customizável
-- Estilização com tema customizado
-- Ícone prefixo configurável
-
----
-
-#### **4. SearchableDropdown**
-Dropdown avançado com campo de busca para grandes listas.
-
-**Uso:**
-```dart
-import 'package:w3_diploma/ui/core/componentes_reutilizaveis/searchable_dropdown.dart';
-
-final _turmaController = ValueNotifier<TurmaModel?>(null);
-
-SearchableDropdown<TurmaModel>(
-  controller: _turmaController,
-  label: 'Turma',
-  items: viewModel.turmas,
-  itemAsString: (turma) => turma.nome,
-  itemId: (turma) => turma.turmaID,
-  searchHint: 'Buscar turma...',
-  isRequired: true,
-  validator: (value) {
-    if (value == null) return 'Selecione uma turma';
-    return null;
-  },
-  onChanged: (turma) {
-    // Callback quando um item é selecionado
-  },
-)
-```
-
-**Características:**
-- Genérico (`T`)
-- Busca em tempo real com filtro
-- Overlay customizado
-- Seleção com indicador visual
-- Validação integrada ao FormField
-- Gerenciamento via `ValueNotifier`
-- Atualização automática da lista de itens
-- Estados vazios tratados
 
 ---
 
@@ -652,35 +516,37 @@ Componentes com menos de 30 linhas devem permanecer na screen principal.
 | Extra Small Medium | 12px | 500 | `context.customTextTheme.textXsMedium` |
 | Extra Small | 12px | 400 | `context.customTextTheme.textXs` |
 
-### **🎨 Cores (NewAppColorTheme)**
+### **🎨 Cores (CustomColorTheme - Flowbite)**
 
 **IMPORTANTE**: Todo `Colors.*`, `Theme.of(context).colorScheme.*` DEVE ser substituído por `context.colorTheme`:
 
 | Descrição | Flutter Equivalent (OBRIGATÓRIO) |
 |-----------|--------------------------------|
-| Fundo principal | `context.colorTheme.background` |
-| Texto principal | `context.colorTheme.foreground` |
-| Cor primária | `context.colorTheme.primary` |
-| Texto sobre primário | `context.colorTheme.primaryForeground` |
-| Primário claro | `context.colorTheme.primaryLight` |
-| Primário escuro | `context.colorTheme.primaryShade` |
-| Cor secundária | `context.colorTheme.secondary` |
-| Texto sobre secundário | `context.colorTheme.secondaryForeground` |
-| Verde de sucesso | `context.colorTheme.success` |
-| Texto sobre sucesso | `context.colorTheme.successForeground` |
-| Laranja de aviso | `context.colorTheme.warning` |
-| Texto sobre aviso | `context.colorTheme.warningForeground` |
-| Vermelho de erro | `context.colorTheme.destructive` |
-| Texto sobre erro | `context.colorTheme.destructiveForeground` |
-| Fundo de cards | `context.colorTheme.card` |
-| Texto em cards | `context.colorTheme.cardForeground` |
-| Fundo neutro | `context.colorTheme.muted` |
-| Texto secundário | `context.colorTheme.mutedForeground` |
-| Cor de destaque | `context.colorTheme.accent` |
-| Texto sobre destaque | `context.colorTheme.accentForeground` |
-| Bordas | `context.colorTheme.border` |
-| Fundo de inputs | `context.colorTheme.background` |
-| Foco/seleção | `context.colorTheme.ring` |
+| Fundo principal | `context.colorTheme.bgNeutralPrimary` |
+| Texto principal (body) | `context.colorTheme.fgBody` |
+| Texto título/heading | `context.colorTheme.fgHeading` |
+| Cor primária (brand) | `context.colorTheme.bgBrand` |
+| Texto sobre primário | `context.colorTheme.fgBrand` |
+| Primário claro | `context.colorTheme.bgBrandSoft` |
+| Primário médio | `context.colorTheme.bgBrandMedium` |
+| Primário escuro | `context.colorTheme.bgBrandStrong` |
+| Cor secundária | `context.colorTheme.bgNeutralSecondary` |
+| Texto secundário | `context.colorTheme.fgBodySubtle` |
+| Verde de sucesso (fundo) | `context.colorTheme.bgSuccess` |
+| Verde de sucesso (texto) | `context.colorTheme.fgSuccess` |
+| Laranja de aviso (fundo) | `context.colorTheme.bgWarning` |
+| Laranja de aviso (texto) | `context.colorTheme.fgWarning` |
+| Vermelho de erro | `context.colorTheme.bgDanger` |
+| Vermelho de erro (foreground) | `context.colorTheme.fgDanger` |
+| Fundo de cards | `context.colorTheme.bgNeutralPrimary` |
+| Texto em cards | `context.colorTheme.fgHeading` |
+| Fundo neutro | `context.colorTheme.bgNeutralTertiary` |
+| Texto secundário | `context.colorTheme.fgBodySubtle` |
+| Cor de destaque | `context.colorTheme.bgBrandSoft` |
+| Texto sobre destaque | `context.colorTheme.fgBrand` |
+| Bordas | `context.colorTheme.borderDefault` |
+| Fundo de inputs | `context.colorTheme.bgNeutralPrimary` |
+| Foco/seleção | `context.colorTheme.borderBrandLight` |
 
 ### **🚫 CONVERSÕES PROIBIDAS**
 
@@ -694,10 +560,11 @@ Componentes com menos de 30 linhas devem permanecer na screen principal.
 - `context.customTextTheme.*`
 - `context.colorTheme.*`
 
-### **📦 Import Obrigatório**
+### **📦 Imports Obrigatórios**
 
 ```dart
 import 'package:w3_diploma/ui/core/extensions/build_context_extension.dart';
+import 'package:w3_diploma/ui/core/themes/flowbite_colors.dart'; // Opcional: para usar cores estáticas como FlowbiteColors.white
 ```
 
 ### **🎯 Exemplos de Estilização Obrigatória**
@@ -716,7 +583,7 @@ Text(
 Text(
   'Título',
   style: context.customTextTheme.text2xlBold.copyWith(
-    color: context.colorTheme.primary,
+    color: context.colorTheme.fgHeading,
   ),
 )
 
@@ -728,11 +595,11 @@ Card(
 
 // ✅ CORRETO - Card com tema customizado
 Card(
-  color: context.colorTheme.card,
+  color: context.colorTheme.bgNeutralPrimary,
   child: Text(
     'Conteúdo',
     style: context.customTextTheme.textBase.copyWith(
-      color: context.colorTheme.cardForeground,
+      color: context.colorTheme.fgHeading,
     ),
   ),
 )

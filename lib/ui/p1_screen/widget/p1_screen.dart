@@ -1,534 +1,283 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
-import 'package:sentinela/ui/p1_screen/viewmodel/event_viewmodel.dart';
-import 'package:sentinela/ui/p1_screen/widget/componentes/event_card.dart';
-import 'package:sentinela/ui/p1_screen/widget/componentes/event_table_header.dart';
-import 'package:sentinela/ui/p1_screen/widget/componentes/filter_bar.dart';
-import 'package:sentinela/ui/p1_screen/widget/componentes/pagination_bar.dart';
+import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
+import 'componentes/breadcrumb.dart';
+import 'componentes/user_model_mock.dart';
+import 'componentes/users_filter_bar.dart';
+import 'componentes/users_table.dart';
 
+/// Tela de gerenciamento de usuários
+///
+/// Exibe uma tabela com lista de usuários, filtros e ações de CRUD.
+/// Implementada seguindo os padrões do custom_screen.md.
 final class P1Screen extends StatefulWidget {
-  final EventViewModel viewModel;
-
-  const P1Screen({Key? key, required this.viewModel}) : super(key: key);
+  const P1Screen({super.key});
 
   @override
   State<P1Screen> createState() => _P1ScreenState();
 }
 
 class _P1ScreenState extends State<P1Screen> {
-  final Set<int> _selectedEventIds = {};
-  bool _allSelected = false;
+  // ==================== STATE ====================
 
-  @override
-  void initState() {
-    super.initState();
-    // LISTENERS OBRIGATÓRIOS PARA 3 COMMANDS
-    widget.viewModel.updateEvent.addListener(
-      () => _onResult(
-        command: widget.viewModel.updateEvent,
-        successMessage: 'Evento atualizado com sucesso!',
-      ),
-    );
-    widget.viewModel.deleteEvent.addListener(
-      () => _onResult(
-        command: widget.viewModel.deleteEvent,
-        successMessage: 'Evento excluído com sucesso!',
-      ),
-    );
-    widget.viewModel.createEvent.addListener(
-      () => _onResult(
-        command: widget.viewModel.createEvent,
-        successMessage: 'Evento criado com sucesso!',
-      ),
-    );
-    // EXECUTAR GET ALL OBRIGATÓRIO
-    widget.viewModel.getAllEvents.execute();
-  }
+  /// IDs dos usuários selecionados na tabela
+  Set<int> _selectedUserIds = {};
 
-  @override
-  void dispose() {
-    // DISPOSE DE TODOS OS LISTENERS OBRIGATÓRIO
-    widget.viewModel.updateEvent.removeListener(
-      () => _onResult(
-        command: widget.viewModel.updateEvent,
-        successMessage: 'Evento atualizado com sucesso!',
-      ),
-    );
-    widget.viewModel.deleteEvent.removeListener(
-      () => _onResult(
-        command: widget.viewModel.deleteEvent,
-        successMessage: 'Evento excluído com sucesso!',
-      ),
-    );
-    widget.viewModel.createEvent.removeListener(
-      () => _onResult(
-        command: widget.viewModel.createEvent,
-        successMessage: 'Evento criado com sucesso!',
-      ),
-    );
-    super.dispose();
-  }
+  /// Filtros selecionados
+  String? _selectedUserRole;
+  String? _selectedStatus;
+  String? _selectedAccountType;
+  String? _selectedRating;
+  String? _selectedCountry;
+  String _selectedShowOnly = 'All';
 
-  /// MÉTODO _onResult OBRIGATÓRIO PARA FEEDBACK VISUAL
-  void _onResult({required dynamic command, required String successMessage}) {
-    if (command.error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erro: ${command.errorMessage ?? 'Ocorreu um erro desconhecido.'}',
-          ),
-          backgroundColor: context.customColorTheme.destructive,
-        ),
-      );
-    } else if (command.completed) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(successMessage),
-          backgroundColor: context.customColorTheme.success,
-        ),
-      );
+  /// Lista de usuários (dados fictícios)
+  List<UserMock> get _filteredUsers {
+    var users = List<UserMock>.from(mockUsers);
+
+    // Aplicar filtro "Show only"
+    switch (_selectedShowOnly) {
+      case 'PRO Accounts':
+        users = users.where((u) => u.accountType == AccountType.pro).toList();
+        break;
+      case 'Admin':
+        users = users.where((u) => u.role == UserRole.administrator).toList();
+        break;
+      case 'Moderators':
+        users = users.where((u) => u.role == UserRole.moderator).toList();
+        break;
+      case 'Viewer':
+        users = users.where((u) => u.role == UserRole.viewer).toList();
+        break;
     }
+
+    // Aplicar filtros de dropdown
+    if (_selectedUserRole != null) {
+      users = users
+          .where((u) => u.role.displayName == _selectedUserRole)
+          .toList();
+    }
+    if (_selectedStatus != null) {
+      users = users
+          .where((u) => u.status.displayName == _selectedStatus)
+          .toList();
+    }
+    if (_selectedAccountType != null) {
+      users = users
+          .where((u) => u.accountType.displayName == _selectedAccountType)
+          .toList();
+    }
+    if (_selectedCountry != null) {
+      users = users.where((u) => u.country == _selectedCountry).toList();
+    }
+
+    return users;
   }
+
+  // ==================== CALLBACKS ====================
+
+  void _onSelectionChanged(Set<int> selectedIds) {
+    setState(() {
+      _selectedUserIds = selectedIds;
+    });
+  }
+
+  void _onUserDetails(UserMock user) {
+    _showSnackBar('Detalhes de ${user.name}');
+  }
+
+  void _onUserEdit(UserMock user) {
+    _showSnackBar('Editando ${user.name}');
+  }
+
+  void _onUserDelete(UserMock user) {
+    _showSnackBar('Deletando ${user.name}', isError: true);
+  }
+
+  void _onAddNewUser() {
+    _showSnackBar('Adicionar novo usuário');
+  }
+
+  void _onDownloadCSV() {
+    _showSnackBar('Download CSV iniciado');
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError
+            ? context.colorTheme.bgDanger
+            : context.colorTheme.bgSuccess,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  // ==================== BUILD ====================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.customColorTheme.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Breadcrumb
-              _buildBreadcrumb(),
-              const SizedBox(height: 16),
+      backgroundColor: context.colorTheme.bgNeutralSecondary,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header com breadcrumb e botão Add
+            _buildHeader(context),
+            const SizedBox(height: 24),
 
-              // Header com título e ações
-              _buildHeader(),
-              const SizedBox(height: 24),
-
-              // Card principal com tabela
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: context.customColorTheme.card,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: context.customColorTheme.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+            // Container principal
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: context.colorTheme.bgNeutralPrimary,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: FlowbiteColors.gray900.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                  child: Column(
-                    children: [
-                      // Filtros
-                      FilterBar(
-                        currentFilter: widget.viewModel.currentFilter,
-                        onFilterChanged: (filter) {
-                          widget.viewModel.updateFilter(filter);
-                        },
-                        onMoreOptions: () {
-                          // TODO: Implementar modal de filtros avançados
-                        },
-                        onActions: () {
-                          // TODO: Implementar menu de ações
-                        },
-                      ),
-
-                      // Conteúdo com estados
-                      Expanded(
-                        child: ListenableBuilder(
-                          listenable: Listenable.merge([
-                            widget.viewModel,
-                            widget.viewModel.getAllEvents,
-                          ]),
-                          builder: (context, _) {
-                            /// ESTADO LOADING OBRIGATÓRIO
-                            if (widget.viewModel.getAllEvents.running) {
-                              return Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const CupertinoActivityIndicator(
-                                      radius: 20,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Carregando eventos...',
-                                      style: context.customTextTheme.textBase
-                                          .copyWith(
-                                            color: context
-                                                .customColorTheme
-                                                .mutedForeground,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-
-                            /// ESTADO ERROR OBRIGATÓRIO
-                            if (widget.viewModel.getAllEvents.error) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.error_outline,
-                                        size: 64,
-                                        color: context
-                                            .customColorTheme
-                                            .destructive,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'Erro ao carregar eventos',
-                                        style: context
-                                            .customTextTheme
-                                            .textLgSemibold
-                                            .copyWith(
-                                              color: context
-                                                  .customColorTheme
-                                                  .foreground,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        widget
-                                                .viewModel
-                                                .getAllEvents
-                                                .errorMessage ??
-                                            'Ocorreu um erro desconhecido',
-                                        style: context.customTextTheme.textBase
-                                            .copyWith(
-                                              color: context
-                                                  .customColorTheme
-                                                  .mutedForeground,
-                                            ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(height: 24),
-                                      ElevatedButton.icon(
-                                        onPressed: () {
-                                          widget.viewModel.getAllEvents
-                                              .execute();
-                                        },
-                                        icon: const Icon(Icons.refresh),
-                                        label: const Text('Tentar novamente'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              context.customColorTheme.primary,
-                                          foregroundColor: context
-                                              .customColorTheme
-                                              .primaryForeground,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-
-                            /// ESTADO EMPTY OBRIGATÓRIO
-                            if (widget.viewModel.events.isEmpty) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.event_busy,
-                                        size: 64,
-                                        color: context
-                                            .customColorTheme
-                                            .mutedForeground,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'Nenhum evento encontrado',
-                                        style: context
-                                            .customTextTheme
-                                            .textLgMedium
-                                            .copyWith(
-                                              color: context
-                                                  .customColorTheme
-                                                  .foreground,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Crie um novo evento para começar',
-                                        style: context.customTextTheme.textBase
-                                            .copyWith(
-                                              color: context
-                                                  .customColorTheme
-                                                  .mutedForeground,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-
-                            /// ESTADO SUCCESS - LISTA DE DADOS
-                            return Column(
-                              children: [
-                                // Header da tabela
-                                EventTableHeader(
-                                  allSelected: _allSelected,
-                                  onSelectAll: (value) {
-                                    setState(() {
-                                      _allSelected = value ?? false;
-                                      if (_allSelected) {
-                                        _selectedEventIds.addAll(
-                                          widget.viewModel.events.map(
-                                            (e) => e.id,
-                                          ),
-                                        );
-                                      } else {
-                                        _selectedEventIds.clear();
-                                      }
-                                    });
-                                  },
-                                  onSort: (column) {
-                                    // TODO: Implementar ordenação
-                                  },
-                                ),
-
-                                // Lista de eventos
-                                Expanded(
-                                  child: ListView.builder(
-                                    itemCount: widget.viewModel.events.length,
-                                    itemBuilder: (context, index) {
-                                      final event =
-                                          widget.viewModel.events[index];
-                                      final isSelected = _selectedEventIds
-                                          .contains(event.id);
-
-                                      return EventCard(
-                                        event: event,
-                                        isSelected: isSelected,
-                                        onCheckboxChanged: (value) {
-                                          setState(() {
-                                            if (value ?? false) {
-                                              _selectedEventIds.add(event.id);
-                                            } else {
-                                              _selectedEventIds.remove(
-                                                event.id,
-                                              );
-                                            }
-                                            _allSelected =
-                                                _selectedEventIds.length ==
-                                                widget.viewModel.events.length;
-                                          });
-                                        },
-                                        onEdit: () {
-                                          // TODO: Implementar edição
-                                        },
-                                        onPreview: () {
-                                          // TODO: Implementar preview
-                                        },
-                                        onDelete: () {
-                                          _showDeleteConfirmation(event.id);
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-
-                      // Paginação
-                      ListenableBuilder(
-                        listenable: widget.viewModel,
-                        builder: (context, _) {
-                          return PaginationBar(
-                            currentPage: widget.viewModel.currentPage,
-                            totalPages: widget.viewModel.totalPages,
-                            totalRecords: widget.viewModel.totalRecords,
-                            pageSize: widget.viewModel.pageSize,
-                            onPreviousPage: () {
-                              widget.viewModel.goToPreviousPage();
-                            },
-                            onNextPage: () {
-                              widget.viewModel.goToNextPage();
-                            },
-                            onPageSelected: (page) {
-                              widget.viewModel.goToPage(page);
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
-            ],
-          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Filtros
+                  UsersFilterBar(
+                    selectedUserRole: _selectedUserRole,
+                    selectedStatus: _selectedStatus,
+                    selectedAccountType: _selectedAccountType,
+                    selectedRating: _selectedRating,
+                    selectedCountry: _selectedCountry,
+                    selectedShowOnly: _selectedShowOnly,
+                    onUserRoleChanged: (value) =>
+                        setState(() => _selectedUserRole = value),
+                    onStatusChanged: (value) =>
+                        setState(() => _selectedStatus = value),
+                    onAccountTypeChanged: (value) =>
+                        setState(() => _selectedAccountType = value),
+                    onRatingChanged: (value) =>
+                        setState(() => _selectedRating = value),
+                    onCountryChanged: (value) =>
+                        setState(() => _selectedCountry = value),
+                    onShowOnlyChanged: (value) =>
+                        setState(() => _selectedShowOnly = value),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Tabela de usuários
+                  UsersTable(
+                    users: _filteredUsers,
+                    selectedUserIds: _selectedUserIds,
+                    onSelectionChanged: _onSelectionChanged,
+                    onUserDetails: _onUserDetails,
+                    onUserEdit: _onUserEdit,
+                    onUserDelete: _onUserDelete,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Footer com botão Download e contador
+                  _buildFooter(context),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildBreadcrumb() {
-    return Row(
-      children: [
-        Text(
-          'Home',
-          style: context.customTextTheme.textSm.copyWith(
-            color: context.customColorTheme.mutedForeground,
-          ),
-        ),
-        Icon(
-          Icons.chevron_right,
-          size: 16,
-          color: context.customColorTheme.mutedForeground,
-        ),
-        Text(
-          'Events',
-          style: context.customTextTheme.textSm.copyWith(
-            color: context.customColorTheme.mutedForeground,
-          ),
-        ),
-        Icon(
-          Icons.chevron_right,
-          size: 16,
-          color: context.customColorTheme.mutedForeground,
-        ),
-        Text(
-          'All events',
-          style: context.customTextTheme.textSmMedium.copyWith(
-            color: context.customColorTheme.foreground,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'All Events',
-              style: context.customTextTheme.text3xlBold.copyWith(
-                color: context.customColorTheme.foreground,
-              ),
+            // Breadcrumb
+            Breadcrumb(
+              items: [
+                BreadcrumbItem(
+                  label: 'Dashboard',
+                  icon: Icons.home_outlined,
+                  onTap: () {},
+                ),
+                BreadcrumbItem(label: '2022', onTap: () {}),
+                const BreadcrumbItem(label: 'All Users'),
+              ],
             ),
-            const SizedBox(width: 12),
+            const SizedBox(height: 8),
+            // Título
             Text(
-              '${widget.viewModel.totalRecords} results',
-              style: context.customTextTheme.textBase.copyWith(
-                color: context.customColorTheme.mutedForeground,
+              'Users',
+              style: context.customTextTheme.text2xlBold.copyWith(
+                color: context.colorTheme.fgHeading,
               ),
-            ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.info_outline,
-              size: 20,
-              color: context.customColorTheme.mutedForeground,
             ),
           ],
         ),
-        Row(
-          children: [
-            ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Implementar criação de evento
-              },
-              icon: const Icon(Icons.add, size: 20),
-              label: const Text('Create event'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.customColorTheme.primary,
-                foregroundColor: context.customColorTheme.primaryForeground,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+        // Botão Add new user
+        ElevatedButton.icon(
+          onPressed: _onAddNewUser,
+          icon: const Icon(Icons.add, size: 18),
+          label: Text(
+            'Add new user',
+            style: context.customTextTheme.textSmSemibold.copyWith(
+              color: FlowbiteColors.white,
             ),
-            const SizedBox(width: 8),
-            OutlinedButton.icon(
-              onPressed: () {
-                // TODO: Implementar exportação
-              },
-              icon: const Icon(Icons.ios_share, size: 20),
-              label: const Text('Export'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: context.customColorTheme.foreground,
-                side: BorderSide(color: context.customColorTheme.border),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: FlowbiteColors.blue600,
+            foregroundColor: FlowbiteColors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-          ],
+            elevation: 0,
+          ),
         ),
       ],
     );
   }
 
-  void _showDeleteConfirmation(int eventId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: context.customColorTheme.card,
-        title: Text(
-          'Excluir evento',
-          style: context.customTextTheme.textLgSemibold.copyWith(
-            color: context.customColorTheme.foreground,
-          ),
-        ),
-        content: Text(
-          'Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.',
-          style: context.customTextTheme.textBase.copyWith(
-            color: context.customColorTheme.mutedForeground,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Cancelar',
-              style: context.customTextTheme.textSmMedium.copyWith(
-                color: context.customColorTheme.mutedForeground,
-              ),
+  Widget _buildFooter(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Botão Download CSV
+        ElevatedButton.icon(
+          onPressed: _onDownloadCSV,
+          icon: const Icon(Icons.download, size: 18),
+          label: Text(
+            'Download CSV',
+            style: context.customTextTheme.textSmSemibold.copyWith(
+              color: FlowbiteColors.white,
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              widget.viewModel.deleteEvent.execute(eventId);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.customColorTheme.destructive,
-              foregroundColor: context.customColorTheme.destructiveForeground,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: FlowbiteColors.blue600,
+            foregroundColor: FlowbiteColors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: const Text('Excluir'),
+            elevation: 0,
           ),
-        ],
-      ),
+        ),
+        // Total de usuários
+        Text(
+          'Total users: ${mockUsers.length}',
+          style: context.customTextTheme.textSmMedium.copyWith(
+            color: context.colorTheme.fgBodySubtle,
+          ),
+        ),
+      ],
     );
   }
 }
