@@ -9,10 +9,6 @@ Future<void> main() async {
   // Carrega variáveis de ambiente
   await dotenv.load(fileName: '.env');
 
-  // Retira o hash da URL para uma navegação mais limpa
-  // setUrlStrategy(PathUrlStrategy());
-
-  // Configura as dependências do aplicativo
   runApp(MultiProvider(providers: providers, child: const MyApp()));
 }
 
@@ -21,11 +17,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final authRepository = context.read<AuthRepository>();
-
     return MaterialApp.router(
       title: 'Flutter Demo',
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,

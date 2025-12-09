@@ -5,7 +5,6 @@ import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/viewmodel/si
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
 import 'package:sentinela/ui/core/themes/colors.dart';
 
-
 final myDefaultBackground = Colors.grey[300];
 
 class Sidebar extends StatefulWidget {
@@ -93,6 +92,12 @@ class _SidebarState extends State<Sidebar> {
                 indexGlobalSideBar: widget.sideBarIndex,
                 itemId: 0,
                 rotaParaNavegacao: Routes.p1,
+              ),
+              HoverableListTile(
+                title: 'Kabam',
+                indexGlobalSideBar: widget.sideBarIndex,
+                itemId: 1,
+                rotaParaNavegacao: Routes.kabam,
               ),
               // CustomExpansionTile(
               //   title: 'Geral',
