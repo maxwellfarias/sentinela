@@ -1,9 +1,10 @@
 import 'package:sentinela/data/model/login_response_api_model.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 import 'package:sentinela/data/services/api/auth_api_client/auth_api_client.dart';
 import 'package:sentinela/data/services/logger/app_logger.dart';
 import 'package:sentinela/utils/result.dart';
 
-final class AuthRepositoryImpl {
+final class AuthRepositoryImpl implements AuthRepository {
   final AuthApiClient _authApiClient;
   final AppLogger _logger;
   AuthRepositoryImpl({required AuthApiClient authApiClient, required AppLogger logger})

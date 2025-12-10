@@ -19,7 +19,7 @@ List<SingleChildWidget> get providers {
    Provider(create: (_) => AppLoggerImpl() as AppLogger),
     
     // API Clients
-   Provider(create: (context) => AuthApiClientImpl(url: urlBaseAuthClient, dio: context.read(), logger: context.read())),
+   Provider(create: (context) => AuthApiClientImpl(url: urlBaseAuthClient, dio: context.read(), logger: context.read()) as AuthApiClient),
 
    //Repositories
    Provider(create: (context) => AuthRepositoryImpl(authApiClient: context.read(), logger: context.read()) as AuthRepository),
