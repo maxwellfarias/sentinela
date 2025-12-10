@@ -24,6 +24,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    widget.viewModel.login.addListener(_onLoginResult);
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -373,7 +379,10 @@ class _LoginScreenState extends State<LoginScreen> {
       height: 48,
       child: ElevatedButton(
         onPressed: () {
-          // Sign in action
+          widget.viewModel.login.execute((
+            email: _emailController.text,
+            password: _passwordController.text,
+          ));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: context.colorTheme.bgBrand,
@@ -420,5 +429,18 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
+  }
+
+  void _onLoginResult() {
+    if(widget.viewModel.login.completed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login Realizado com sucesso!')),
+        );
+    } else if (widget.viewModel.login.error) {
+      final messageErro = widget.viewModel.login.errorMessage ?? 'Erro desconhecido';
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: $messageErro')),
+        );
+    }
   }
 }

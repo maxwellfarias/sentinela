@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:sentinela/routing/routes.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/resposive_layout.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/viewmodel/sidebar_viewmodel.dart';
@@ -61,7 +62,8 @@ GoRouter router() => GoRouter(
 
     GoRoute(
       path: Routes.login,
-      builder: (context, state) => LoginScreen(viewModel: LoginViewmodel()),
+      builder: (context, state) => LoginScreen(viewModel: LoginViewmodel(authRepository: context.read()),
     ),
+    )
   ],
 );

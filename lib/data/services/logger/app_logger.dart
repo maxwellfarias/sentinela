@@ -3,7 +3,7 @@
 ///
 /// Implementações desta interface podem usar diferentes estratégias de logging
 /// (console, arquivo, serviços remotos, etc.).
-abstract interface class Logger {
+abstract interface class AppLogger {
   /// Registra uma mensagem informativa.
   ///
   /// [message] A mensagem a ser registrada.
@@ -23,7 +23,12 @@ abstract interface class Logger {
   /// [tag] Tag opcional para categorizar o log (geralmente o nome da classe).
   /// [error] Objeto de erro opcional associado.
   /// [stackTrace] Stack trace opcional para rastreamento de erro.
-  void error(String message, {String? tag, Object? error, StackTrace? stackTrace});
+  void error(
+    String message, {
+    String? tag,
+    Object? error,
+    StackTrace? stackTrace,
+  });
 
   /// Registra uma mensagem de depuração.
   ///

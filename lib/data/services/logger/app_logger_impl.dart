@@ -1,6 +1,6 @@
 import 'dart:developer' as dev;
 
-import 'package:sentinela/data/services/logger/logger.dart';
+import 'package:sentinela/data/services/logger/app_logger.dart';
 
 /// Implementação concreta do Logger usando dart:developer.
 ///
@@ -10,7 +10,7 @@ import 'package:sentinela/data/services/logger/logger.dart';
 /// - info: 800
 /// - warning: 900
 /// - error: 1000
-class AppLoggerImpl implements Logger {
+class AppLoggerImpl implements AppLogger {
   @override
   void info(String message, {String? tag}) {
     dev.log(message, name: tag ?? 'App', level: 800);
@@ -22,7 +22,12 @@ class AppLoggerImpl implements Logger {
   }
 
   @override
-  void error(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
+  void error(
+    String message, {
+    String? tag,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
     dev.log(
       message,
       name: tag ?? 'App',
