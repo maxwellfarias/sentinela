@@ -1,682 +1,424 @@
-// import 'package:flutter/material.dart';
-// import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
-// import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
+import 'package:flutter/material.dart';
+import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
+import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
+import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
 
+/// Tela de login profissional do W3Diploma
+///
+/// Apresenta formulário de autenticação com campos de CPF e senha,
+/// opção de manter sessão logada e design responsivo seguindo
+/// a paleta de cores e tipografia do aplicativo.
+class LoginScreen extends StatefulWidget {
+  final LoginViewmodel viewModel;
 
-// /// Tela de login profissional do W3Diploma
-// ///
-// /// Apresenta formulário de autenticação com campos de CPF e senha,
-// /// opção de manter sessão logada e design responsivo seguindo
-// /// a paleta de cores e tipografia do aplicativo.
-// class LoginScreen extends StatefulWidget {
-//   final LoginViewmodel viewModel;
+  const LoginScreen({super.key, required this.viewModel});
 
-//   const LoginScreen({super.key, required this.viewModel});
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
-//   @override
-//   State<LoginScreen> createState() => _LoginScreenState();
-// }
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _rememberMe = false;
+  bool _obscurePassword = true;
 
-// class _LoginScreenState extends State<LoginScreen> {
-//   final _formKey = GlobalKey<FormState>();
-//   final _emailController = TextEditingController();
-//   final _senhaController = TextEditingController();
-//   bool _manterConectado = false;
-//   bool _senhaVisivel = false;
-//   bool _carregando = false;
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-//   /// Valida o formato do email
-//   String? _validarEmail(String? valor) {
-//     if (valor == null || valor.isEmpty) {
-//       return 'Por favor, informe o email';
-//     }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: context.colorTheme.bgNeutralPrimary,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 665),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Logo Aura
+                _buildLogo(),
+                const SizedBox(height: 48),
 
-//     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-//     if (!emailRegex.hasMatch(valor)) {
-//       return 'Email inválido';
-//     }
+                // Welcome back heading
+                Text(
+                  'Welcome back',
+                  textAlign: TextAlign.center,
+                  style: context.customTextTheme.text4xlBold.copyWith(
+                    color: context.colorTheme.fgHeading,
+                  ),
+                ),
+                const SizedBox(height: 12),
 
-//     return null;
-//   }
+                // Subtitle
+                Text(
+                  'Please enter your details to sign in',
+                  textAlign: TextAlign.center,
+                  style: context.customTextTheme.textBase.copyWith(
+                    color: context.colorTheme.fgBodySubtle,
+                  ),
+                ),
+                const SizedBox(height: 32),
 
-//   /// Valida o campo de senha
-//   String? _validarSenha(String? valor) {
-//     if (valor == null || valor.isEmpty) {
-//       return 'Por favor, informe a senha';
-//     }
+                // Social login buttons
+                _buildSocialLoginButtons(),
+                const SizedBox(height: 32),
 
-//     if (valor.length < 6) {
-//       return 'Senha deve ter no mínimo 6 caracteres';
-//     }
+                // OR divider
+                _buildOrDivider(),
+                const SizedBox(height: 32),
 
-//     return null;
-//   }
+                // Email field
+                _buildEmailField(),
+                const SizedBox(height: 20),
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     // Adiciona listener para o comando de login
-//     widget.viewModel.loginCommand.addListener(_onLoginStateChanged);
-//   }
+                // Password field
+                _buildPasswordField(),
+                const SizedBox(height: 20),
 
-//   @override
-//   void dispose() {
-//     widget.viewModel.loginCommand.removeListener(_onLoginStateChanged);
-//     _emailController.dispose();
-//     _senhaController.dispose();
-//     super.dispose();
-//   }
+                // Remember me and Forgot password
+                _buildRememberMeAndForgotPassword(),
+                const SizedBox(height: 32),
 
-//   /// Callback chamado quando o estado do login muda
-//   void _onLoginStateChanged() {
-//     if (!mounted) return;
+                // Sign in button
+                _buildSignInButton(),
+                const SizedBox(height: 32),
 
-//     // Atualiza o estado de carregamento
-//     setState(() {
-//       _carregando = widget.viewModel.loginCommand.running;
-//     });
+                // Sign up link
+                _buildSignUpLink(),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-//     // Se o comando completou com sucesso
-//     if (widget.viewModel.loginCommand.completed) {
-//       // O GoRouter vai redirecionar automaticamente via route guards
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text(
-//             'Login realizado com sucesso!',
-//             style: context.customTextTheme.textSmMedium.copyWith(
-//               color: context.customColorTheme.successForeground,
-//             ),
-//           ),
-//           backgroundColor: context.customColorTheme.success,
-//         ),
-//       );
-//     }
+  Widget _buildLogo() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                context.colorTheme.bgBrandMedium,
+                context.colorTheme.bgBrand,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          'Aura',
+          style: context.customTextTheme.text2xlBold.copyWith(
+            color: context.colorTheme.fgHeading,
+          ),
+        ),
+      ],
+    );
+  }
 
-//     // Se o comando completou com erro
-//     if (widget.viewModel.loginCommand.error) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text(
-//             widget.viewModel.loginCommand.errorMessage ?? 'Erro ao fazer login',
-//             style: context.customTextTheme.textSmMedium.copyWith(
-//               color: context.customColorTheme.destructiveForeground,
-//             ),
-//           ),
-//           backgroundColor: context.customColorTheme.destructive,
-//         ),
-//       );
-//     }
-//   }
+  Widget _buildSocialLoginButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildSocialButton(
+          icon: Icons.g_mobiledata,
+          onPressed: () {
+            // Google login
+          },
+        ),
+        const SizedBox(width: 16),
+        _buildSocialButton(
+          icon: Icons.apple,
+          onPressed: () {
+            // Apple login
+          },
+        ),
+        const SizedBox(width: 16),
+        _buildSocialButton(
+          icon: Icons.close, // X icon
+          onPressed: () {
+            // X/Twitter login
+          },
+        ),
+      ],
+    );
+  }
 
-//   /// Realiza o login
-//   Future<void> _realizarLogin() async {
-//     if (!_formKey.currentState!.validate()) {
-//       return;
-//     }
+  Widget _buildSocialButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: context.colorTheme.borderDefault, width: 1),
+        color: context.colorTheme.bgNeutralPrimary,
+      ),
+      child: IconButton(
+        icon: Icon(icon, size: 28, color: context.colorTheme.fgHeading),
+        onPressed: onPressed,
+      ),
+    );
+  }
 
-//     // Executa o comando de login
-//     await widget.viewModel.loginCommand.execute((
-//       cpf: _emailController.text,
-//       password: _senhaController.text,
-//     ));
-//   }
+  Widget _buildOrDivider() {
+    return Row(
+      children: [
+        Expanded(
+          child: Divider(color: context.colorTheme.borderDefault, thickness: 1),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            'OR',
+            style: context.customTextTheme.textSm.copyWith(
+              color: context.colorTheme.fgBodySubtle,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Divider(color: context.colorTheme.borderDefault, thickness: 1),
+        ),
+      ],
+    );
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final screenWidth = context.screenSize.width;
-//     final isMobile = screenWidth < 768;
-//     final isTablet = screenWidth >= 768 && screenWidth < 1024;
+  Widget _buildEmailField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Your Email Address',
+          style: context.customTextTheme.textSmMedium.copyWith(
+            color: context.colorTheme.fgHeading,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          style: context.customTextTheme.textBase.copyWith(
+            color: context.colorTheme.fgHeading,
+          ),
+          decoration: InputDecoration(
+            hintText: 'Your Email Address',
+            hintStyle: context.customTextTheme.textBase.copyWith(
+              color: context.colorTheme.fgBodySubtle,
+            ),
+            filled: true,
+            fillColor: context.colorTheme.bgNeutralPrimary,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.colorTheme.borderDefault),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.colorTheme.borderDefault),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: context.colorTheme.borderBrandLight,
+                width: 2,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
-//     return Scaffold(
-//       body: Stack(
-//         children: [
-//           // Fundo com gradiente moderno
-//           _buildModernBackground(),
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Password',
+          style: context.customTextTheme.textSmMedium.copyWith(
+            color: context.colorTheme.fgHeading,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _passwordController,
+          obscureText: _obscurePassword,
+          style: context.customTextTheme.textBase.copyWith(
+            color: context.colorTheme.fgHeading,
+          ),
+          decoration: InputDecoration(
+            hintText: '•••••••••',
+            hintStyle: context.customTextTheme.textBase.copyWith(
+              color: context.colorTheme.fgBodySubtle,
+            ),
+            filled: true,
+            fillColor: context.colorTheme.bgNeutralPrimary,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.colorTheme.borderDefault),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.colorTheme.borderDefault),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: context.colorTheme.borderBrandLight,
+                width: 2,
+              ),
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: context.colorTheme.fgBodySubtle,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              },
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
-//           // Conteúdo da tela
-//           SafeArea(
-//             child: Center(
-//               child: SingleChildScrollView(
-//                 padding: EdgeInsets.symmetric(
-//                   horizontal: isMobile ? 24 : (isTablet ? 48 : 64),
-//                   vertical: 32,
-//                 ),
-//                 child: ConstrainedBox(
-//                   constraints: const BoxConstraints(maxWidth: 440),
-//                   child: Column(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     crossAxisAlignment: CrossAxisAlignment.stretch,
-//                     children: [
-//                       // Logo e título
-//                       _buildHeader(),
+  Widget _buildRememberMeAndForgotPassword() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: Checkbox(
+                value: _rememberMe,
+                onChanged: (value) {
+                  setState(() {
+                    _rememberMe = value ?? false;
+                  });
+                },
+                activeColor: context.colorTheme.bgBrand,
+                side: BorderSide(
+                  color: context.colorTheme.borderDefault,
+                  width: 1.5,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Remember me',
+              style: context.customTextTheme.textSm.copyWith(
+                color: context.colorTheme.fgHeading,
+              ),
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: () {
+            // Forgot password
+          },
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            'Forgot password?',
+            style: context.customTextTheme.textSm.copyWith(
+              color: context.colorTheme.fgHeading,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
-//                       SizedBox(height: isMobile ? 40 : 56),
+  Widget _buildSignInButton() {
+    return SizedBox(
+      height: 48,
+      child: ElevatedButton(
+        onPressed: () {
+          // Sign in action
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: context.colorTheme.bgBrand,
+          foregroundColor: FlowbiteColors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 0,
+        ),
+        child: Text(
+          'Sign in',
+          style: context.customTextTheme.textBaseMedium.copyWith(
+            color: FlowbiteColors.white,
+          ),
+        ),
+      ),
+    );
+  }
 
-//                       // Card de login
-//                       _buildLoginCard(),
-
-//                       const SizedBox(height: 24),
-
-//                       // Link de recuperação de senha
-//                       _buildRecuperarSenhaLink(),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   /// Constrói o fundo moderno com gradiente e elementos decorativos
-//   Widget _buildModernBackground() {
-//     return Container(
-//       decoration: BoxDecoration(
-//         gradient: LinearGradient(
-//           begin: Alignment.topLeft,
-//           end: Alignment.bottomRight,
-//           colors: [
-//             context.customColorTheme.background,
-//             context.customColorTheme.accent,
-//             context.customColorTheme.primaryLight.withValues(alpha: 0.3),
-//           ],
-//           stops: const [0.0, 0.5, 1.0],
-//         ),
-//       ),
-//       child: Stack(
-//         children: [
-//           // Círculo decorativo superior direito
-//           Positioned(
-//             top: -100,
-//             right: -100,
-//             child: Container(
-//               width: 300,
-//               height: 300,
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle,
-//                 gradient: RadialGradient(
-//                   colors: [
-//                     context.customColorTheme.primary.withValues(alpha: 0.15),
-//                     context.customColorTheme.primary.withValues(alpha: 0.0),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-
-//           // Círculo decorativo inferior esquerdo
-//           Positioned(
-//             bottom: -150,
-//             left: -150,
-//             child: Container(
-//               width: 400,
-//               height: 400,
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle,
-//                 gradient: RadialGradient(
-//                   colors: [
-//                     context.customColorTheme.primaryLight.withValues(
-//                       alpha: 0.2,
-//                     ),
-//                     context.customColorTheme.primaryLight.withValues(
-//                       alpha: 0.0,
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-
-//           // Círculo decorativo meio direito
-//           Positioned(
-//             top: 200,
-//             right: -80,
-//             child: Container(
-//               width: 200,
-//               height: 200,
-//               decoration: BoxDecoration(
-//                 shape: BoxShape.circle,
-//                 gradient: RadialGradient(
-//                   colors: [
-//                     context.customColorTheme.accent.withValues(alpha: 0.3),
-//                     context.customColorTheme.accent.withValues(alpha: 0.0),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-
-//           // Formas geométricas sutis
-//           Positioned(
-//             top: 150,
-//             left: 50,
-//             child: Transform.rotate(
-//               angle: 0.5,
-//               child: Container(
-//                 width: 80,
-//                 height: 80,
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(16),
-//                   gradient: LinearGradient(
-//                     colors: [
-//                       context.customColorTheme.primary.withValues(alpha: 0.08),
-//                       context.customColorTheme.primary.withValues(alpha: 0.0),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-
-//           Positioned(
-//             bottom: 250,
-//             right: 100,
-//             child: Transform.rotate(
-//               angle: -0.3,
-//               child: Container(
-//                 width: 60,
-//                 height: 60,
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(12),
-//                   gradient: LinearGradient(
-//                     colors: [
-//                       context.customColorTheme.primaryShade.withValues(
-//                         alpha: 0.06,
-//                       ),
-//                       context.customColorTheme.primaryShade.withValues(
-//                         alpha: 0.0,
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   /// Constrói o cabeçalho com logo e título
-//   Widget _buildHeader() {
-//     return Column(
-//       children: [
-//         // Logo (ícone de diploma/certificado)
-//         Container(
-//           width: 80,
-//           height: 80,
-//           decoration: BoxDecoration(
-//             color: context.customColorTheme.primary,
-//             borderRadius: BorderRadius.circular(20),
-//             boxShadow: [
-//               BoxShadow(
-//                 color: context.customColorTheme.shadowElegant,
-//                 blurRadius: 24,
-//                 offset: const Offset(0, 8),
-//               ),
-//             ],
-//           ),
-//           child: Icon(
-//             Icons.security,
-//             size: 40,
-//             color: context.customColorTheme.primaryForeground,
-//           ),
-//         ),
-
-//         const SizedBox(height: 24),
-
-//         // Título
-//         Text(
-//           'Sentilela',
-//           style: context.customTextTheme.text3xlBold.copyWith(
-//             color: context.customColorTheme.foreground,
-//           ),
-//           textAlign: TextAlign.center,
-//         ),
-
-//         const SizedBox(height: 8),
-
-//         // Subtítulo
-//         Text(
-//           'Gestão Acadêmica Inteligente',
-//           style: context.customTextTheme.textBaseMedium.copyWith(
-//             color: context.customColorTheme.mutedForeground,
-//           ),
-//           textAlign: TextAlign.center,
-//         ),
-//       ],
-//     );
-//   }
-
-//   /// Constrói o card de login com formulário
-//   Widget _buildLoginCard() {
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: context.customColorTheme.card,
-//         borderRadius: BorderRadius.circular(16),
-//         border: Border.all(color: context.customColorTheme.border, width: 1),
-//         boxShadow: [
-//           BoxShadow(
-//             color: context.customColorTheme.shadowCard,
-//             blurRadius: 12,
-//             offset: const Offset(0, 4),
-//           ),
-//         ],
-//       ),
-//       padding: const EdgeInsets.all(32),
-//       child: Form(
-//         key: _formKey,
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.stretch,
-//           children: [
-//             // Título do formulário
-//             Text(
-//               'Entrar na sua conta',
-//               style: context.customTextTheme.textXlSemibold.copyWith(
-//                 color: context.customColorTheme.cardForeground,
-//               ),
-//             ),
-
-//             const SizedBox(height: 8),
-
-//             Text(
-//               'Informe suas credenciais para acessar',
-//               style: context.customTextTheme.textSm.copyWith(
-//                 color: context.customColorTheme.mutedForeground,
-//               ),
-//             ),
-
-//             const SizedBox(height: 32),
-
-//             // Campo Email
-//             _buildEmailField(),
-
-//             const SizedBox(height: 20),
-
-//             // Campo Senha
-//             _buildSenhaField(),
-
-//             const SizedBox(height: 16),
-
-//             // Checkbox manter conectado
-//             _buildManterConectadoCheckbox(),
-
-//             const SizedBox(height: 32),
-
-//             // Botão de login
-//             _buildLoginButton(),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   /// Constrói o campo de Email
-//   Widget _buildEmailField() {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text(
-//           'Email',
-//           style: context.customTextTheme.textSmMedium.copyWith(
-//             color: context.customColorTheme.cardForeground,
-//           ),
-//         ),
-//         const SizedBox(height: 8),
-//         TextFormField(
-//           controller: _emailController,
-//           keyboardType: TextInputType.emailAddress,
-//           validator: _validarEmail,
-//           decoration: InputDecoration(
-//             hintText: 'seu@email.com',
-//             hintStyle: context.customTextTheme.textBase.copyWith(
-//               color: context.customColorTheme.mutedForeground,
-//             ),
-//             prefixIcon: Icon(
-//               Icons.email_outlined,
-//               color: context.customColorTheme.mutedForeground,
-//             ),
-//             filled: true,
-//             fillColor: context.customColorTheme.background,
-//             border: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.border,
-//                 width: 1,
-//               ),
-//             ),
-//             enabledBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.border,
-//                 width: 1,
-//               ),
-//             ),
-//             focusedBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.ring,
-//                 width: 2,
-//               ),
-//             ),
-//             errorBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.destructive,
-//                 width: 1,
-//               ),
-//             ),
-//             focusedErrorBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.destructive,
-//                 width: 2,
-//               ),
-//             ),
-//             contentPadding: const EdgeInsets.symmetric(
-//               horizontal: 16,
-//               vertical: 14,
-//             ),
-//           ),
-//           style: context.customTextTheme.textBase.copyWith(
-//             color: context.customColorTheme.cardForeground,
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   /// Constrói o campo de senha
-//   Widget _buildSenhaField() {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Text(
-//           'Senha',
-//           style: context.customTextTheme.textSmMedium.copyWith(
-//             color: context.customColorTheme.cardForeground,
-//           ),
-//         ),
-//         const SizedBox(height: 8),
-//         TextFormField(
-//           controller: _senhaController,
-//           obscureText: !_senhaVisivel,
-//           validator: _validarSenha,
-//           decoration: InputDecoration(
-//             hintText: 'Digite sua senha',
-//             hintStyle: context.customTextTheme.textBase.copyWith(
-//               color: context.customColorTheme.mutedForeground,
-//             ),
-//             prefixIcon: Icon(
-//               Icons.lock_outline_rounded,
-//               color: context.customColorTheme.mutedForeground,
-//             ),
-//             suffixIcon: IconButton(
-//               icon: Icon(
-//                 _senhaVisivel
-//                     ? Icons.visibility_outlined
-//                     : Icons.visibility_off_outlined,
-//                 color: context.customColorTheme.mutedForeground,
-//               ),
-//               onPressed: () {
-//                 setState(() {
-//                   _senhaVisivel = !_senhaVisivel;
-//                 });
-//               },
-//             ),
-//             filled: true,
-//             fillColor: context.customColorTheme.background,
-//             border: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.border,
-//                 width: 1,
-//               ),
-//             ),
-//             enabledBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.border,
-//                 width: 1,
-//               ),
-//             ),
-//             focusedBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.ring,
-//                 width: 2,
-//               ),
-//             ),
-//             errorBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.destructive,
-//                 width: 1,
-//               ),
-//             ),
-//             focusedErrorBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(8),
-//               borderSide: BorderSide(
-//                 color: context.customColorTheme.destructive,
-//                 width: 2,
-//               ),
-//             ),
-//             contentPadding: const EdgeInsets.symmetric(
-//               horizontal: 16,
-//               vertical: 14,
-//             ),
-//           ),
-//           style: context.customTextTheme.textBase.copyWith(
-//             color: context.customColorTheme.cardForeground,
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   /// Constrói o checkbox de manter conectado
-//   Widget _buildManterConectadoCheckbox() {
-//     return Row(
-//       children: [
-//         SizedBox(
-//           width: 20,
-//           height: 20,
-//           child: Checkbox(
-//             value: _manterConectado,
-//             onChanged: (valor) {
-//               setState(() {
-//                 _manterConectado = valor ?? false;
-//               });
-//             },
-//             activeColor: context.customColorTheme.primary,
-//             side: BorderSide(
-//               color: context.customColorTheme.border,
-//               width: 1.5,
-//             ),
-//             shape: RoundedRectangleBorder(
-//               borderRadius: BorderRadius.circular(4),
-//             ),
-//           ),
-//         ),
-//         const SizedBox(width: 12),
-//         Expanded(
-//           child: Text(
-//             'Manter-me conectado',
-//             style: context.customTextTheme.textSm.copyWith(
-//               color: context.customColorTheme.cardForeground,
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   /// Constrói o botão de login
-//   Widget _buildLoginButton() {
-//     return SizedBox(
-//       height: 48,
-//       child: ElevatedButton(
-//         onPressed: _carregando ? null : _realizarLogin,
-//         style: ElevatedButton.styleFrom(
-//           backgroundColor: context.customColorTheme.primary,
-//           foregroundColor: context.customColorTheme.primaryForeground,
-//           disabledBackgroundColor: context.customColorTheme.muted,
-//           disabledForegroundColor: context.customColorTheme.mutedForeground,
-//           elevation: 0,
-//           shadowColor: Colors.transparent,
-//           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-//         ),
-//         child: _carregando
-//             ? SizedBox(
-//                 width: 20,
-//                 height: 20,
-//                 child: CircularProgressIndicator(
-//                   strokeWidth: 2,
-//                   valueColor: AlwaysStoppedAnimation<Color>(
-//                     context.customColorTheme.primaryForeground,
-//                   ),
-//                 ),
-//               )
-//             : Text(
-//                 'Entrar',
-//                 style: context.customTextTheme.textBaseMedium.copyWith(
-//                   color: context.customColorTheme.primaryForeground,
-//                 ),
-//               ),
-//       ),
-//     );
-//   }
-
-//   /// Constrói o link de recuperação de senha
-//   Widget _buildRecuperarSenhaLink() {
-//     return Center(
-//       child: TextButton(
-//         onPressed: () {
-//           // TODO: Implementar recuperação de senha
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(
-//               content: Text(
-//                 'Funcionalidade em desenvolvimento',
-//                 style: context.customTextTheme.textSmMedium.copyWith(
-//                   color: context.customColorTheme.cardForeground,
-//                 ),
-//               ),
-//               backgroundColor: context.customColorTheme.muted,
-//             ),
-//           );
-//         },
-//         style: TextButton.styleFrom(
-//           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//         ),
-//         child: Text(
-//           'Esqueceu sua senha?',
-//           style: context.customTextTheme.textSmMedium.copyWith(
-//             color: context.customColorTheme.primary,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+  Widget _buildSignUpLink() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Don't have an account? ",
+          style: context.customTextTheme.textSm.copyWith(
+            color: context.colorTheme.fgBodySubtle,
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            // Navigate to sign up
+          },
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            'Sign up',
+            style: context.customTextTheme.textSmMedium.copyWith(
+              color: context.colorTheme.fgHeading,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

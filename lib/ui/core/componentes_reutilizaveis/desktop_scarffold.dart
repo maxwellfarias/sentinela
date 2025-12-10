@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/widgets/sidebar.dart';
+import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
 
 class DesktopScaffold extends StatefulWidget {
   final Widget child;
@@ -15,7 +16,7 @@ class _DesktopScaffoldState extends State<DesktopScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: myDefaultBackground,
+      backgroundColor: context.colorTheme.bgBrand,
       body: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

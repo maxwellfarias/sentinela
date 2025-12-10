@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:sentinela/routing/routes.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/resposive_layout.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/viewmodel/sidebar_viewmodel.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/widgets/sidebar.dart';
 import 'package:sentinela/ui/kabam/widget/kabam.dart';
+import 'package:sentinela/ui/login/widget/login_screen.dart';
+import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
 import 'package:sentinela/ui/p1_screen/widget/p1_screen.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
@@ -15,7 +16,7 @@ final _sideBarIndex = ValueNotifier<int>(8);
 GoRouter router() => GoRouter(
   navigatorKey: _rootNavigationKey,
   // initialLocation: Routes.gerarXmlDocumentacaoAcademica,
-  initialLocation: Routes.p1,
+  initialLocation: Routes.login,
   debugLogDiagnostics: true,
   redirect: (context, state) async {
     // final loggedIn = await authRepository.isAuthenticated();
@@ -60,7 +61,7 @@ GoRouter router() => GoRouter(
 
     GoRoute(
       path: Routes.login,
-      builder: (context, state) => Container(),
+      builder: (context, state) => LoginScreen(viewModel: LoginViewmodel()),
     ),
   ],
 );

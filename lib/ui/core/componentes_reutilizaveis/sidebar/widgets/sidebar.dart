@@ -3,9 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:sentinela/routing/routes.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/viewmodel/sidebar_viewmodel.dart';
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
-import 'package:sentinela/ui/core/themes/colors.dart';
-
-final myDefaultBackground = Colors.grey[300];
 
 class Sidebar extends StatefulWidget {
   final ValueNotifier<int> sideBarIndex;
@@ -26,7 +23,7 @@ class _SidebarState extends State<Sidebar> {
     // Captura o messenger e navigator antes do async gap
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
-    final colorTheme = context.customColorTheme;
+    final colorTheme = context.colorTheme;
 
     await widget.viewModel.logout.execute();
 
@@ -39,7 +36,7 @@ class _SidebarState extends State<Sidebar> {
           content: Text(
             'Erro ao fazer logout: ${widget.viewModel.logout.errorMessage ?? 'Erro desconhecido'}',
           ),
-          backgroundColor: colorTheme.destructive,
+          backgroundColor: colorTheme.bgDanger,
         ),
       );
     } else if (widget.viewModel.logout.completed) {
@@ -49,7 +46,7 @@ class _SidebarState extends State<Sidebar> {
       messenger.showSnackBar(
         SnackBar(
           content: Text('Logout realizado com sucesso'),
-          backgroundColor: colorTheme.success,
+          backgroundColor: colorTheme.bgSuccess,
         ),
       );
     }
@@ -63,10 +60,10 @@ class _SidebarState extends State<Sidebar> {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: context.customColorTheme.sidebarBackground,
+            color: context.colorTheme.bgNeutralPrimary,
             border: Border(
               right: BorderSide(
-                color: context.customColorTheme.accent,
+                color: context.colorTheme.borderDefault,
                 width: 1,
               ),
             ),
@@ -173,7 +170,7 @@ class _SidebarState extends State<Sidebar> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: context.customColorTheme.border,
+                          color: context.colorTheme.borderDefault,
                           width: 1,
                         ),
                       ),
@@ -187,8 +184,8 @@ class _SidebarState extends State<Sidebar> {
                               height: 16,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation(
-                                  context.customColorTheme.accent,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  context.colorTheme.fgBody,
                                 ),
                               ),
                             )
@@ -196,7 +193,7 @@ class _SidebarState extends State<Sidebar> {
                             Icon(
                               Icons.logout,
                               color:
-                                  context.customColorTheme.secondaryForeground,
+                                  context.colorTheme.bgBrandMedium,
                             ),
                           Text(
                             widget.viewModel.logout.running
@@ -204,9 +201,7 @@ class _SidebarState extends State<Sidebar> {
                                 : 'Sair',
                             style: context.customTextTheme.textSmSemibold
                                 .copyWith(
-                                  color: context
-                                      .customColorTheme
-                                      .secondaryForeground,
+                                  color: context.colorTheme.bgBrandMedium,
                                 ),
                           ),
                         ],
@@ -273,7 +268,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _textColor = context.customColorTheme.accent;
+    _textColor = context.colorTheme.fgBodySubtle;
   }
 
   //Função para alternar a expansão e disparar a animação
@@ -300,10 +295,10 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
       children: [
         MouseRegion(
           onEnter: (event) => setState(
-            () => _textColor = AppColors.primaryDark,
+            () => _textColor = context.colorTheme.fgBrand,
           ), // Cor ao passar o mouse
           onExit: (event) => setState(
-            () => _textColor = context.customColorTheme.accent,
+            () => _textColor = context.colorTheme.fgBodySubtle,
           ), // Volta à cor padrão
           child: InkWell(
             onTap: _toggleExpansion,
@@ -312,7 +307,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
               children: [
                 Icon(
                   Icons.folder,
-                  color: context.customColorTheme.accent,
+                  color: context.colorTheme.fgBodySubtle,
                   size: 20,
                 ),
                 SizedBox(width: 10), // Espaçamento entre o ícone e o texto
@@ -327,7 +322,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
                 IconButton(
                   icon: Icon(
                     _isExpanded ? Icons.remove : Icons.add,
-                    color: context.customColorTheme.accent,
+                    color: context.colorTheme.fgBodySubtle,
                     size: 20,
                   ),
                   onPressed: _toggleExpansion,
@@ -390,7 +385,7 @@ class _HoverableListTileState extends State<HoverableListTile> {
       onEnter: (event) => setState(() {
         _isHovering = true;
         _backgroundColor =
-            context.customColorTheme.accent; // Cor ao passar o mouse
+            context.colorTheme.bgBrandSoft; // Cor ao passar o mouse
       }),
       onExit: (event) => setState(() {
         _isHovering = false;
@@ -405,9 +400,7 @@ class _HoverableListTileState extends State<HoverableListTile> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected
-                ? context.customColorTheme.accent
-                : _backgroundColor,
+            color: isSelected ? context.colorTheme.bgBrand : _backgroundColor,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Container(
@@ -417,8 +410,8 @@ class _HoverableListTileState extends State<HoverableListTile> {
               widget.title,
               style: context.customTextTheme.textSmMedium.copyWith(
                 color: (_isHovering || isSelected)
-                    ? AppColors.primaryDark
-                    : context.customColorTheme.sidebarForeground,
+                    ? context.colorTheme.fgBrandStrong
+                    : context.colorTheme.fgBody,
               ),
             ),
           ),
