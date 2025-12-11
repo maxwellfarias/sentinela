@@ -16,7 +16,6 @@ final class LoginViewmodel {
 
   Future<Result<dynamic>> _login(({String email, String password}) params) async {
     final result = await _authRepository.login(email: params.email, password: params.password);
-
     return result;
   }
 }

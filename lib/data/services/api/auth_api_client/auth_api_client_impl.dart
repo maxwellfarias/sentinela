@@ -9,60 +9,58 @@ final class AuthApiClientImpl implements AuthApiClient {
   String baseUrl;
   AppLogger _logger;
   String _tag = 'AuthApiClientImpl';
-  AuthApiClientImpl({
-    required Dio dio,
-    required String url,
-    required AppLogger logger,
-  }) : _dio = dio,
+  AuthApiClientImpl({required Dio dio,required String url, required AppLogger logger}) : _dio = dio,
        baseUrl = url,
        _logger = logger;
 
+  final apiKey = "sb_publishable_yehVgeZN4iWGS4nrEGRb2w_-A9MQt6K";
+
   @override
-  Future<Result<dynamic>> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<Result<dynamic>> login({required String email, required String password}) async {
     try {
-      final response = await _dio.post(
-        '${baseUrl}token?grant_type=password',
-        data: {'email': email, 'password': password},
-      );
+      final response = await _dio.post('${baseUrl}token?grant_type=password', data: {'email': email, 'password': password}, options: Options(headers: {'apiKey': apiKey}));
       return _handleResponse(response);
-    } catch (e, s) {
-      _logger.error(
-        'Erro ao realizar login',
-        tag: _tag,
-        error: e,
-        stackTrace: s,
-      );
-      return Result.error(UnknownErrorException());
+    } on DioException catch (e, s) {
+      _logger.error('DioError ao realizar login: ${e.message}', tag: _tag, error: e, stackTrace: s);
+      if (e.response != null) {
+        return _handleResponse(e.response!);
+      } else {
+        return Result.error(UnknownErrorException());
+      }
     }
   }
 
-  dynamic _handleResponse(Response response) {
-    _logger.debug(
-      'Response received: $response',
-      tag: _tag,
-    );
+  Result<dynamic> _handleResponse(Response response) {
+    _logger.debug('Response received: ${response.statusCode}', tag: _tag);
     switch (response.statusCode) {
       case 200:
         {
-          if (response.data.isEmpty) return null;
-          return response.data;
+          if (response.data == null || response.data.toString().isEmpty) {
+            return Result.ok(null);
+          }
+          return Result.ok(response.data);
         }
+      case 201:
+        return Result.ok(response.data);
       case 204:
-        return null;
+        return Result.ok(null);
       case 400:
-        Result.error(RequisicaoInvalidaException());
+        return Result.error(RequisicaoInvalidaException());
       case 401:
-        Result.error(NaoAutorizadoException());
+        return Result.error(NaoAutorizadoException());
       case 403:
-        Result.error(AcessoProibidoException());
+        return Result.error(AcessoProibidoException());
       case 404:
-        Result.error(RecursoNaoEncontradoException());
+        return Result.error(RecursoNaoEncontradoException());
       case 500:
-        Result.error(ErroInternoServidorException());
+        return Result.error(ErroInternoServidorException());
+      case 503:
+        return Result.error(ServidorIndisponivelException());
       default:
+        _logger.warning(
+          'Código de status não tratado: ${response.statusCode}',
+          tag: _tag,
+        );
         return Result.error(UnknownErrorException());
     }
   }

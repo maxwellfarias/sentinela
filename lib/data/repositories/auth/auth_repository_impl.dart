@@ -20,7 +20,7 @@ final class AuthRepositoryImpl implements AuthRepository {
       _currentUser = loginResponse.user;
       return loginResponse;
     });
-    return Result.ok(null);
+    return result;
   }
 }
 
