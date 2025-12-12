@@ -31,6 +31,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
     : _secureStorage = secureStorage;
 
   /// Salva o token de autenticação
+  @override
   Future<Result<void>> saveToken(String? token) async {
     try {
       if (token == null) {
@@ -45,6 +46,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   /// Recupera o token de autenticação
+  @override
   Future<Result<String?>> getToken() async {
     try {
       final token = await _secureStorage.read(key: _tokenKey);
@@ -55,6 +57,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   /// Salva o refresh token
+  @override
   Future<Result<void>> saveRefreshToken(String? refreshToken) async {
     try {
       if (refreshToken == null) {
@@ -69,6 +72,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   /// Recupera o refresh token
+  @override
   Future<Result<String?>> getRefreshToken() async {
     try {
       final refreshToken = await _secureStorage.read(key: _refreshTokenKey);
@@ -79,6 +83,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   /// Salva a data de expiração do token (formato ISO 8601)
+  @override
   Future<Result<void>> saveTokenExpires(String? expires) async {
     try {
       if (expires == null) {
@@ -93,6 +98,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   /// Recupera a data de expiração do token
+  @override
   Future<Result<String?>> getTokenExpires() async {
     try {
       final expires = await _secureStorage.read(key: _tokenExpiresKey);
@@ -106,6 +112,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   ///
   /// Retorna true se faltar menos de 5 minutos para expirar,
   /// false caso contrário, ou null se não houver data de expiração salva
+  @override
   Future<Result<bool?>> isTokenNearExpiration() async {
     try {
       final expiresResult = await getTokenExpires();
@@ -127,6 +134,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   /// Limpa todos os dados armazenados
+  @override
   Future<Result<void>> clearAll() async {
     try {
       await _secureStorage.deleteAll();

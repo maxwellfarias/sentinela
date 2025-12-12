@@ -68,8 +68,7 @@ class AuthInterceptor extends Interceptor {
 
     try {
       // Verifica se o token está próximo de expirar
-      final isNearExpirationResult = await _storageService
-          .isTokenNearExpiration();
+      final isNearExpirationResult = await _storageService.isTokenNearExpiration();
       final isNearExpiration = isNearExpirationResult.getSuccessOrNull();
 
       // Se está próximo de expirar, renova o token
@@ -209,8 +208,7 @@ class AuthInterceptor extends Interceptor {
 
       // Cria a requisição de refresh
       final refreshRequest = <String, dynamic>{
-        'token': token,
-        'refreshToken': refreshToken,
+        'refresh_token': refreshToken,
       };
 
       _logger.info('Enviando requisição de refresh token', tag: _logTag);

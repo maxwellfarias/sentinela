@@ -50,7 +50,7 @@ List<SingleChildWidget> get providers {
       create: (context) =>
           AuthRepositoryImpl(
                 authApiClient: context.read(),
-                logger: context.read(),
+                logger: context.read(), storageService: context.read(),
               )
               as AuthRepository,
     ),
