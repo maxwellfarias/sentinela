@@ -1,0 +1,128 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../exceptions/app_exception.dart';
+import '../../../utils/result.dart';
+
+/// Serviço para armazenamento seguro de dados sensíveis
+///
+/// Utiliza FlutterSecureStorage para criptografar e armazenar:
+/// - Tokens de autenticação (JWT e refresh token)
+/// - Informações do usuário
+/// - Configurações sensíveis
+class SecureStorageService {
+  final FlutterSecureStorage _secureStorage;
+
+  // Chaves para armazenamento
+  static const String _tokenKey = 'auth_token';
+  static const String _refreshTokenKey = 'refresh_token';
+  static const String _tokenExpiresKey = 'token_expires';
+
+  SecureStorageService({
+    FlutterSecureStorage? secureStorage,
+  }) : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+
+  /// Salva o token de autenticação
+  Future<Result<void>> saveToken(String? token) async {
+    try {
+      if (token == null) {
+        await _secureStorage.delete(key: _tokenKey);
+      } else {
+        await _secureStorage.write(key: _tokenKey, value: token);
+      }
+      return const Result.ok(null);
+    } catch (e) {
+      return Result.error(ErroAoSalvarTokenException());
+    }
+  }
+
+  /// Recupera o token de autenticação
+  Future<Result<String?>> getToken() async {
+    try {
+      final token = await _secureStorage.read(key: _tokenKey);
+      return Result.ok(token);
+    } catch (e) {
+      return Result.error(ErroAoRecuperarTokenException());
+    }
+  }
+
+  /// Salva o refresh token
+  Future<Result<void>> saveRefreshToken(String? refreshToken) async {
+    try {
+      if (refreshToken == null) {
+        await _secureStorage.delete(key: _refreshTokenKey);
+      } else {
+        await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
+      }
+      return const Result.ok(null);
+    } catch (e) {
+      return Result.error(ErroAoSalvarTokenException());
+    }
+  }
+
+  /// Recupera o refresh token
+  Future<Result<String?>> getRefreshToken() async {
+    try {
+      final refreshToken = await _secureStorage.read(key: _refreshTokenKey);
+      return Result.ok(refreshToken);
+    } catch (e) {
+      return Result.error(ErroAoRecuperarTokenException());
+    }
+  }
+
+  /// Salva a data de expiração do token (formato ISO 8601)
+  Future<Result<void>> saveTokenExpires(String? expires) async {
+    try {
+      if (expires == null) {
+        await _secureStorage.delete(key: _tokenExpiresKey);
+      } else {
+        await _secureStorage.write(key: _tokenExpiresKey, value: expires);
+      }
+      return const Result.ok(null);
+    } catch (e) {
+      return Result.error(ErroAoSalvarTokenException());
+    }
+  }
+
+  /// Recupera a data de expiração do token
+  Future<Result<String?>> getTokenExpires() async {
+    try {
+      final expires = await _secureStorage.read(key: _tokenExpiresKey);
+      return Result.ok(expires);
+    } catch (e) {
+      return Result.error(ErroAoRecuperarTokenException());
+    }
+  }
+
+  /// Verifica se o token está próximo de expirar (menos de 5 minutos)
+  ///
+  /// Retorna true se faltar menos de 5 minutos para expirar,
+  /// false caso contrário, ou null se não houver data de expiração salva
+  Future<Result<bool?>> isTokenNearExpiration() async {
+    try {
+      final expiresResult = await getTokenExpires();
+      final expiresValue = expiresResult.getSuccessOrNull();
+
+      if (expiresValue == null) {
+        return const Result.ok(null);
+      }
+
+      final expiresDate = DateTime.parse(expiresValue);
+      final now = DateTime.now();
+      final difference = expiresDate.difference(now);
+
+      // Considera "próximo de expirar" se faltar menos de 5 minutos
+      return Result.ok(difference.inMinutes < 5);
+    } catch (e) {
+      return const Result.ok(null);
+    }
+  }
+
+  /// Limpa todos os dados armazenados
+  Future<Result<void>> clearAll() async {
+    try {
+      await _secureStorage.deleteAll();
+      return const Result.ok(null);
+    } catch (e) {
+      return Result.error(ErroAoLimparDadosException());
+    }
+  }
+}
