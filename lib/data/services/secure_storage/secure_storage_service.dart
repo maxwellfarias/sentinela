@@ -2,13 +2,24 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../exceptions/app_exception.dart';
 import '../../../utils/result.dart';
 
+abstract interface class SecureStorageService {
+  Future<Result<void>> saveToken(String? token);
+  Future<Result<String?>> getToken();
+  Future<Result<void>> saveRefreshToken(String? refreshToken);
+  Future<Result<String?>> getRefreshToken();
+  Future<Result<void>> saveTokenExpires(String? expires);
+  Future<Result<String?>> getTokenExpires();
+  Future<Result<bool?>> isTokenNearExpiration();
+  Future<Result<void>> clearAll();
+}
+
 /// Serviço para armazenamento seguro de dados sensíveis
 ///
 /// Utiliza FlutterSecureStorage para criptografar e armazenar:
 /// - Tokens de autenticação (JWT e refresh token)
 /// - Informações do usuário
 /// - Configurações sensíveis
-class SecureStorageService {
+class SecureStorageServiceImpl implements SecureStorageService {
   final FlutterSecureStorage _secureStorage;
 
   // Chaves para armazenamento
@@ -16,9 +27,8 @@ class SecureStorageService {
   static const String _refreshTokenKey = 'refresh_token';
   static const String _tokenExpiresKey = 'token_expires';
 
-  SecureStorageService({
-    FlutterSecureStorage? secureStorage,
-  }) : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+  SecureStorageServiceImpl({required FlutterSecureStorage secureStorage})
+    : _secureStorage = secureStorage;
 
   /// Salva o token de autenticação
   Future<Result<void>> saveToken(String? token) async {

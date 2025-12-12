@@ -58,14 +58,18 @@ class AuthInterceptor extends Interceptor {
 
     // Não adiciona token nas rotas de autenticação
     if (_isAuthenticationRoute(url)) {
-      _logger.info('Requisição para rota de autenticação, sem adicionar token', tag: _logTag);
+      _logger.info(
+        'Requisição para rota de autenticação, sem adicionar token',
+        tag: _logTag,
+      );
       // Ignora o token e prossegue
       return handler.next(options);
     }
 
     try {
       // Verifica se o token está próximo de expirar
-      final isNearExpirationResult = await _storageService.isTokenNearExpiration();
+      final isNearExpirationResult = await _storageService
+          .isTokenNearExpiration();
       final isNearExpiration = isNearExpirationResult.getSuccessOrNull();
 
       // Se está próximo de expirar, renova o token
@@ -216,9 +220,7 @@ class AuthInterceptor extends Interceptor {
         "https://fkwbaagyzxafgaphidfb.supabase.co/auth/v1/token?grant_type=refresh_token",
         data: refreshRequest,
         options: Options(
-          headers: {
-            'apikey': 'sb_publishable_yehVgeZN4iWGS4nrEGRb2w_-A9MQt6K',
-          },
+          headers: {'apikey': 'sb_publishable_yehVgeZN4iWGS4nrEGRb2w_-A9MQt6K'},
         ),
       );
 
