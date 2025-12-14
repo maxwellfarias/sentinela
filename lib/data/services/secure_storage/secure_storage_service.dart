@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../exceptions/app_exception.dart';
 import '../../../utils/result.dart';
 
-abstract interface class SecureStorageService {
+abstract class SecureStorageService extends ChangeNotifier {
   Future<Result<void>> saveToken(String? token);
   Future<Result<String?>> getToken();
   Future<Result<void>> saveRefreshToken(String? refreshToken);
@@ -13,13 +14,7 @@ abstract interface class SecureStorageService {
   Future<Result<void>> clearAll();
 }
 
-/// Serviço para armazenamento seguro de dados sensíveis
-///
-/// Utiliza FlutterSecureStorage para criptografar e armazenar:
-/// - Tokens de autenticação (JWT e refresh token)
-/// - Informações do usuário
-/// - Configurações sensíveis
-class SecureStorageServiceImpl implements SecureStorageService {
+class SecureStorageServiceImpl extends SecureStorageService {
   final FlutterSecureStorage _secureStorage;
 
   // Chaves para armazenamento
@@ -138,6 +133,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   Future<Result<void>> clearAll() async {
     try {
       await _secureStorage.deleteAll();
+      notifyListeners();
       return const Result.ok(null);
     } catch (e) {
       return Result.error(ErroAoLimparDadosException());

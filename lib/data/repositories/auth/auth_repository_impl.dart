@@ -6,7 +6,7 @@ import 'package:sentinela/data/services/secure_storage/secure_storage_service.da
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/result.dart';
 
-final class AuthRepositoryImpl implements AuthRepository {
+final class AuthRepositoryImpl extends AuthRepository {
   final AuthApiClient _authApiClient;
   final AppLogger _logger;
   final SecureStorageService _storageService;
@@ -16,9 +16,12 @@ final class AuthRepositoryImpl implements AuthRepository {
     required SecureStorageService storageService,
   }) : _authApiClient = authApiClient,
        _logger = logger,
-       _storageService = storageService;
+       _storageService = storageService {
+        _storageService.addListener(_onClearAuthData);
+       }
 
   UserApiModel? _currentUser;
+  bool get isLoggedIn => _currentUser != null;
 
   @override
   Future<Result<dynamic>> login({required String email, required String password}) async {
@@ -28,12 +31,21 @@ final class AuthRepositoryImpl implements AuthRepository {
         .map(LoginResponseApiModel.fromJson)
         .flatMapAsync((loginResponse) => _storageService.saveToken(loginResponse.accessToken)
             .flatMapAsync((_) => _storageService.saveRefreshToken(loginResponse.refreshToken))
-            .flatMapAsync((_) => _storageService.saveTokenExpires(loginResponse.expiresAt.toString())));
+            .flatMapAsync((_) => _storageService.saveTokenExpires(loginResponse.expiresAt.toString()))
+            .map((_) {
+              _currentUser = loginResponse.user;
+              notifyListeners();
+              return loginResponse;
+            }));
 
     return result;
     } catch (e, s) {
       _logger.error('Erro ao serealizar dados: $e', stackTrace: s);
       return Result.error(UnknownErrorException());
     }
+  }
+  void _onClearAuthData() {
+    _currentUser = null;
+    notifyListeners();
   }
 }
