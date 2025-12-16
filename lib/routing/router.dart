@@ -10,6 +10,8 @@ import 'package:sentinela/ui/kabam/widget/kabam.dart';
 import 'package:sentinela/ui/login/widget/login_screen.dart';
 import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
 import 'package:sentinela/ui/p1_screen/widget/p1_screen.dart';
+import 'package:sentinela/ui/patrol_map/viewmodel/patrol_map_viewmodel.dart';
+import 'package:sentinela/ui/patrol_map/widget/patrol_map_screen.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _mainShellNavigatorKey = GlobalKey<NavigatorState>();
@@ -18,25 +20,25 @@ final _sideBarIndex = ValueNotifier<int>(8);
 GoRouter router({required AuthRepository authRepository}) => GoRouter(
   navigatorKey: _rootNavigationKey,
   // initialLocation: Routes.gerarXmlDocumentacaoAcademica,
-  initialLocation: Routes.p1,
+  initialLocation: Routes.patrolMap,
   refreshListenable: authRepository,
   debugLogDiagnostics: true,
-  redirect: (context, state) async {
-    final loggedIn = authRepository.isLoggedIn;
-    final loggingIn = state.matchedLocation == Routes.login;
+  // redirect: (context, state) async {
+  //   final loggedIn = authRepository.isLoggedIn;
+  //   final loggingIn = state.matchedLocation == Routes.login;
 
-    // Se não estiver autenticado e não estiver na tela de login, redireciona para login
-    if (!loggedIn && !loggingIn) {
-      return Routes.login;
-    }
+  //   // Se não estiver autenticado e não estiver na tela de login, redireciona para login
+  //   if (!loggedIn && !loggingIn) {
+  //     return Routes.login;
+  //   }
 
-    // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
-    if (loggedIn && loggingIn) {
-      return Routes.p1;
-    }
-    // Permite acesso a outras rotas
-    return null;
-  },
+  //   // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
+  //   if (loggedIn && loggingIn) {
+  //     return Routes.p1;
+  //   }
+  //   // Permite acesso a outras rotas
+  //   return null;
+  // },
   // refreshListenable: authRepository,
   errorBuilder: (_, _) => Center(child: SelectableText("Erro 404")),
   routes: [
@@ -59,6 +61,7 @@ GoRouter router({required AuthRepository authRepository}) => GoRouter(
       routes: [
         GoRoute(path: Routes.p1, builder: (context, state) => P1Screen()),
         GoRoute(path: Routes.kabam, builder: (context, state) => Kabam()),
+        GoRoute(path: Routes.patrolMap, builder: (context, state) => PatrolMapScreen(viewModel: PatrolMapViewModel()),),
       ],
     ),
 

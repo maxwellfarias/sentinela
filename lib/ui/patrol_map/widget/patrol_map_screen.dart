@@ -385,6 +385,7 @@ class _PatrolMapScreenState extends State<PatrolMapScreen> {
         target: widget.viewModel.userLocation ?? _initialPosition,
         zoom: 15,
       ),
+      mapType: MapType.normal,
       onMapCreated: widget.viewModel.setMapController,
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
@@ -393,8 +394,6 @@ class _PatrolMapScreenState extends State<PatrolMapScreen> {
       compassEnabled: false,
       markers: _buildMarkers(),
       circles: _buildCircles(),
-      // Estilo dark do mapa
-      style: _darkMapStyle,
     );
   }
 

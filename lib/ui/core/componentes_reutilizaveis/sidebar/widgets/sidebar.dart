@@ -96,6 +96,12 @@ class _SidebarState extends State<Sidebar> {
                 itemId: 1,
                 rotaParaNavegacao: Routes.kabam,
               ),
+              HoverableListTile(
+                title: 'Patrol Map',
+                indexGlobalSideBar: widget.sideBarIndex,
+                itemId: 2,
+                rotaParaNavegacao: Routes.patrolMap,
+              ),
               // CustomExpansionTile(
               //   title: 'Geral',
               //   children: [

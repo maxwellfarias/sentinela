@@ -5,6 +5,7 @@ abstract final class Routes {
   static const signup = '/signup';
   static const p1 = '/p1';
   static const kabam = '/kabam';
+  static const patrolMap = '/patrol-map';
   // static String assinarContratoWithId(String id) => '/assinar-contrato/$id';
   // static String contratoDetalhesWithId(String id) => '/contrato-detalhes/$id';
 }
