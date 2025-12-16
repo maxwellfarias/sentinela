@@ -23,6 +23,7 @@ final class PatrolMapScreen extends StatefulWidget {
 
 class _PatrolMapScreenState extends State<PatrolMapScreen> {
   final TextEditingController _searchController = TextEditingController();
+  bool isShowingModalBottomSheet = false;
 
   // Localização inicial (São Paulo)
   static const LatLng _initialPosition = LatLng(-23.5505, -46.6333);
@@ -91,7 +92,9 @@ class _PatrolMapScreenState extends State<PatrolMapScreen> {
 
   /// Abre o menu lateral
   void _openMenu() {
-    Scaffold.of(context).openDrawer();
+    setState(() {
+      isShowingModalBottomSheet = !isShowingModalBottomSheet;
+    });
   }
 
   /// Abre as notificações
@@ -361,6 +364,7 @@ class _PatrolMapScreenState extends State<PatrolMapScreen> {
               ),
 
               // Bottom Sheet com alerta
+              if(isShowingModalBottomSheet)
               Positioned(
                 bottom: 0,
                 left: 0,

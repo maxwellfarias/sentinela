@@ -179,7 +179,7 @@ class _CircleButton extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: onPressed,
+              onTap:  onPressed,
               customBorder: const CircleBorder(),
               child: Icon(icon, color: context.colorTheme.fgHeading, size: 24),
             ),
