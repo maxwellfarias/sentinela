@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:sentinela/data/services/logger/app_logger.dart';
 import 'package:sentinela/data/services/secure_storage/secure_storage_service.dart';
 

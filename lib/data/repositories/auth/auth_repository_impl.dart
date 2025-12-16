@@ -21,6 +21,7 @@ final class AuthRepositoryImpl extends AuthRepository {
        }
 
   UserApiModel? _currentUser;
+  @override
   bool get isLoggedIn => _currentUser != null;
 
   @override

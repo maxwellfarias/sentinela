@@ -14,6 +14,6 @@ extension StringExtension on String {
 
   /// Remove espaços extras no início, fim e entre palavras
   String trim() {
-    return this.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 }

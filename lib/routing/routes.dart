@@ -1,4 +1,3 @@
-import 'package:sentinela/ui/kabam/widget/kabam.dart';
 
 abstract final class Routes {
   static const home = '/';

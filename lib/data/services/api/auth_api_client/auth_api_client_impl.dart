@@ -6,10 +6,10 @@ import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/result.dart';
 
 final class AuthApiClientImpl implements AuthApiClient {
-  Dio _dio;
+  final Dio _dio;
   String baseUrl;
-  AppLogger _logger;
-  String _tag = 'AuthApiClientImpl';
+  final AppLogger _logger;
+  final String _tag = 'AuthApiClientImpl';
   AuthApiClientImpl({required Dio dio,required String url, required AppLogger logger}) : _dio = dio,
        baseUrl = url,
        _logger = logger;

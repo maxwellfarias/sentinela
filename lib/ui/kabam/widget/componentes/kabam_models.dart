@@ -1,5 +1,6 @@
 /// Modelos de dados para o quadro Kanban
 /// Estes são modelos fictícios para demonstração
+library;
 
 enum BadgeType { tomorrow, daysLeft, done }
 
