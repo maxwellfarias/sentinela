@@ -18,6 +18,7 @@ List<SingleChildWidget> get providers {
   return [
     Provider(create: (_) => FlutterSecureStorage() ),
     Provider(create: (context) => SecureStorageServiceImpl(secureStorage: context.read()) as SecureStorageService),
+    Provider(create: (_) => AppLoggerImpl() as AppLogger),
     // Core providers - Dio com interceptor de autenticação
     Provider(
       create: (context) {

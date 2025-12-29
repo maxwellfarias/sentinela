@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 import 'package:sentinela/routing/routes.dart';
+import 'package:sentinela/ui/cadastro_militar/widget/cadastro_militar.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/resposive_layout.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/viewmodel/sidebar_viewmodel.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/sidebar/widgets/sidebar.dart';
@@ -14,24 +16,24 @@ final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _mainShellNavigatorKey = GlobalKey<NavigatorState>();
 final _sideBarIndex = ValueNotifier<int>(8);
 
-GoRouter router() => GoRouter(
+GoRouter router({required AuthRepository authRepository}) => GoRouter(
   navigatorKey: _rootNavigationKey,
   // initialLocation: Routes.gerarXmlDocumentacaoAcademica,
-  initialLocation: Routes.login,
+  initialLocation: Routes.cadastroMilitar,
   debugLogDiagnostics: true,
   redirect: (context, state) async {
-    // final loggedIn = await authRepository.isAuthenticated();
-    // final loggingIn = state.matchedLocation == Routes.login;
+    final loggedIn = await authRepository.isAuthenticated;
+    final loggingIn = state.matchedLocation == Routes.login;
 
-    // // Se não estiver autenticado e não estiver na tela de login, redireciona para login
-    // if (!loggedIn && !loggingIn) {
-    //   return Routes.login;
-    // }
+    // Se não estiver autenticado e não estiver na tela de login, redireciona para login
+    if (!loggedIn && !loggingIn) {
+      return Routes.login;
+    }
 
-    // // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
-    // if (loggedIn && loggingIn) {
-    //   return Routes.p1;
-    // }
+    // Se estiver autenticado e na tela de login, redireciona para a tela de alunos
+    if (loggedIn && loggingIn) {
+      return Routes.p1;
+    }
     // Permite acesso a outras rotas
     return null;
   },
@@ -57,13 +59,18 @@ GoRouter router() => GoRouter(
       routes: [
         GoRoute(path: Routes.p1, builder: (context, state) => P1Screen()),
         GoRoute(path: Routes.kabam, builder: (context, state) => Kabam()),
+        GoRoute(path: Routes.cadastroMilitar, builder: (context, state) => CadastroMilitar()),
       ],
     ),
 
     GoRoute(
       path: Routes.login,
-      builder: (context, state) => LoginScreen(viewModel: LoginViewmodel(authRepository: context.read(), logger: context.read()),
+      builder: (context, state) => LoginScreen(
+        viewModel: LoginViewmodel(
+          authRepository: context.read(),
+          logger: context.read(),
+        ),
+      ),
     ),
-    )
   ],
 );

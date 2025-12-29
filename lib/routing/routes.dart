@@ -1,11 +1,10 @@
-import 'package:sentinela/ui/kabam/widget/kabam.dart';
-
 abstract final class Routes {
   static const home = '/';
   static const login = '/login';
   static const signup = '/signup';
   static const p1 = '/p1';
   static const kabam = '/kabam';
+  static const cadastroMilitar = '/cadastro-militar';
   // static String assinarContratoWithId(String id) => '/assinar-contrato/$id';
   // static String contratoDetalhesWithId(String id) => '/contrato-detalhes/$id';
 }

@@ -96,6 +96,12 @@ class _SidebarState extends State<Sidebar> {
                 itemId: 1,
                 rotaParaNavegacao: Routes.kabam,
               ),
+              HoverableListTile(
+                title: 'Cadastro do Militar',
+                indexGlobalSideBar: widget.sideBarIndex,
+                itemId: 2,
+                rotaParaNavegacao: Routes.cadastroMilitar,
+              ),
               // CustomExpansionTile(
               //   title: 'Geral',
               //   children: [

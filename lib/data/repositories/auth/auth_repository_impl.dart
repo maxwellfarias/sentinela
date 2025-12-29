@@ -36,4 +36,7 @@ final class AuthRepositoryImpl implements AuthRepository {
       return Result.error(UnknownErrorException());
     }
   }
+  
+  @override
+  Future<bool> get isAuthenticated async => true;
 }
