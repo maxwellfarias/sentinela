@@ -6,7 +6,7 @@ import 'package:sentinela/data/services/secure_storage/secure_storage_service.da
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/result.dart';
 
-final class AuthRepositoryImpl implements AuthRepository {
+final class AuthRepositoryImpl extends AuthRepository {
   final AuthApiClient _authApiClient;
   final AppLogger _logger;
   final SecureStorageService _storageService;

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/extensions/custom_color_theme_extension.dart';
 import 'package:sentinela/ui/core/themes/custom_text_style.dart';
 import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
-import 'package:sentinela/ui/core/themes/new_colors.dart';
 import 'colors.dart';
 
 abstract final class AppTheme {

@@ -12,14 +12,13 @@ import 'package:sentinela/data/services/logger/app_logger_impl.dart';
 import 'package:sentinela/data/services/secure_storage/secure_storage_service.dart';
 
 List<SingleChildWidget> get providers {
-  final urlBaseAuthClient = 'https://fkwbaagyzxafgaphidfb.supabase.co/auth/v1/';
-  final urlBaseClient = ''; // Defina a URL base para o AuthApiClient aqui
+  final urlBaseAuth = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/auth/v1/';
+  final urlBase = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/rest/v1/'; 
 
   return [
     Provider(create: (_) => FlutterSecureStorage() ),
-    Provider(create: (context) => SecureStorageServiceImpl(secureStorage: context.read()) as SecureStorageService),
-    Provider(create: (_) => AppLoggerImpl() as AppLogger),
-    // Core providers - Dio com interceptor de autenticação
+    ChangeNotifierProvider<SecureStorageService>(create: (context) => SecureStorageServiceImpl(secureStorage: context.read()) as SecureStorageService),
+    Provider(create: (context) => AppLoggerImpl() as AppLogger),
     Provider(
       create: (context) {
         final dio = Dio();
@@ -39,7 +38,7 @@ List<SingleChildWidget> get providers {
     Provider(
       create: (context) =>
           AuthApiClientImpl(
-                url: urlBaseAuthClient,
+                url: urlBaseAuth,
                 dio: context.read(),
                 logger: context.read(),
               )
@@ -47,13 +46,12 @@ List<SingleChildWidget> get providers {
     ),
 
     //Repositories
-    Provider(
-      create: (context) =>
-          AuthRepositoryImpl(
-                authApiClient: context.read(),
-                logger: context.read(), storageService: context.read(),
-              )
-              as AuthRepository,
+    ChangeNotifierProvider<AuthRepository>(
+      create: (context) => AuthRepositoryImpl(
+        authApiClient: context.read(),
+        logger: context.read(),
+        storageService: context.read(),
+      ),
     ),
   ];
 }

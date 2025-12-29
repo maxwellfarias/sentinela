@@ -1,9 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:sentinela/utils/result.dart';
 
-abstract interface class AuthRepository {
+abstract class AuthRepository extends ChangeNotifier {
   Future<bool> get isAuthenticated;
-  Future<Result<dynamic>> login({
-    required String email,
-    required String password,
-  });
+  Future<Result<dynamic>> login({required String email, required String password});
 }

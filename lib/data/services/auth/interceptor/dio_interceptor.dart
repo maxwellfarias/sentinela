@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:sentinela/data/services/logger/app_logger.dart';
 import 'package:sentinela/data/services/secure_storage/secure_storage_service.dart';
 
@@ -58,10 +57,7 @@ class AuthInterceptor extends Interceptor {
 
     // Não adiciona token nas rotas de autenticação
     if (_isAuthenticationRoute(url)) {
-      _logger.info(
-        'Requisição para rota de autenticação, sem adicionar token',
-        tag: _logTag,
-      );
+      _logger.info('Requisição para rota de autenticação, sem adicionar token', tag: _logTag);
       // Ignora o token e prossegue
       return handler.next(options);
     }
@@ -170,10 +166,7 @@ class AuthInterceptor extends Interceptor {
   Future<bool> _refreshTokenIfNeeded() async {
     // Se já está renovando, aguarda o resultado do refresh em andamento
     if (_isRefreshing && _refreshFuture != null) {
-      _logger.info(
-        'Refresh já em andamento, aguardando resultado...',
-        tag: _logTag,
-      );
+      _logger.info('Refresh já em andamento, aguardando resultado...',  tag: _logTag);
       return await _refreshFuture!;
     }
 

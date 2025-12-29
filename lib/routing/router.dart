@@ -11,6 +11,8 @@ import 'package:sentinela/ui/kabam/widget/kabam.dart';
 import 'package:sentinela/ui/login/widget/login_screen.dart';
 import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
 import 'package:sentinela/ui/p1_screen/widget/p1_screen.dart';
+import 'package:sentinela/ui/patrol_map/viewmodel/patrol_map_viewmodel.dart';
+import 'package:sentinela/ui/patrol_map/widget/patrol_map_screen.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _mainShellNavigatorKey = GlobalKey<NavigatorState>();

@@ -1,24 +1,40 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sentinela/data/services/api/auth_api_client/auth_api_client.dart';
 import 'package:sentinela/data/services/logger/app_logger.dart';
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/result.dart';
 
 final class AuthApiClientImpl implements AuthApiClient {
-  Dio _dio;
+  final Dio _dio;
   String baseUrl;
-  AppLogger _logger;
-  String _tag = 'AuthApiClientImpl';
+  final AppLogger _logger;
+  final String _tag = 'AuthApiClientImpl';
   AuthApiClientImpl({required Dio dio,required String url, required AppLogger logger}) : _dio = dio,
        baseUrl = url,
        _logger = logger;
 
-  final apiKey = "sb_publishable_yehVgeZN4iWGS4nrEGRb2w_-A9MQt6K";
+  final apiKey = dotenv.env['SUPABASE_PUBLISHABLE_KEY'] ?? '';
 
   @override
   Future<Result<dynamic>> login({required String email, required String password}) async {
     try {
       final response = await _dio.post('${baseUrl}token?grant_type=password', data: {'email': email, 'password': password}, options: Options(headers: {'apiKey': apiKey}));
+      return _handleResponse(response);
+    } on DioException catch (e, s) {
+      _logger.error('DioError ao realizar login: ${e.message}', tag: _tag, error: e, stackTrace: s);
+      if (e.response != null) {
+        return _handleResponse(e.response!);
+      } else {
+        return Result.error(UnknownErrorException());
+      }
+    }
+  }
+
+  Future<Result<dynamic>> logout () async {
+    try {
+      final bearerToken = dotenv.env['SUPABASE_BEARER_TOKEN'] ?? '';
+      final response = await _dio.post('${baseUrl}logout', options: Options(headers: {'apiKey': apiKey}));
       return _handleResponse(response);
     } on DioException catch (e, s) {
       _logger.error('DioError ao realizar login: ${e.message}', tag: _tag, error: e, stackTrace: s);
