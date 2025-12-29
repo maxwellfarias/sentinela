@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
 import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
-import 'componentes/militar_model_mock.dart';
+import 'componentes/militar_form_dialog.dart';
+import '../../../domain/models/policial_militar/policial_militar_model.dart';
 import 'componentes/militares_filter_bar.dart';
 import 'componentes/militares_table.dart';
 
@@ -32,8 +33,8 @@ class _CadastroMilitarState extends State<CadastroMilitar> {
   int _pageSize = 10;
 
   /// Lista de militares (dados fictícios)
-  List<MilitarMock> get _filteredMilitares {
-    var militares = List<MilitarMock>.from(mockMilitares);
+  List<PolicialMilitarModel> get _filteredMilitares {
+    var militares = List<PolicialMilitarModel>.from(mockMilitares);
 
     // Aplicar filtro "Exibir apenas"
     switch (_selectedShowOnly) {
@@ -62,7 +63,7 @@ class _CadastroMilitarState extends State<CadastroMilitar> {
   int get _totalRecords => _filteredMilitares.length;
   int get _totalPages => (_totalRecords / _pageSize).ceil().clamp(1, 100);
 
-  List<MilitarMock> get _paginatedMilitares {
+  List<PolicialMilitarModel> get _paginatedMilitares {
     final startIndex = (_currentPage - 1) * _pageSize;
     final endIndex = (startIndex + _pageSize).clamp(0, _totalRecords);
     if (startIndex >= _totalRecords) return [];
@@ -77,20 +78,43 @@ class _CadastroMilitarState extends State<CadastroMilitar> {
     });
   }
 
-  void _onMilitarDetails(MilitarMock militar) {
+  void _onMilitarDetails(PolicialMilitarModel militar) {
     _showSnackBar('Detalhes de ${militar.nomeGuerra}');
   }
 
-  void _onMilitarEdit(MilitarMock militar) {
-    _showSnackBar('Editando ${militar.nomeGuerra}');
+  void _onMilitarEdit(PolicialMilitarModel militar) {
+    _onEditMilitar(militar);
   }
 
-  void _onMilitarDelete(MilitarMock militar) {
+  void _onMilitarDelete(PolicialMilitarModel militar) {
     _showSnackBar('Deletando ${militar.nomeGuerra}', isError: true);
   }
 
   void _onAddNewMilitar() {
-    _showSnackBar('Adicionar novo militar');
+    MilitarFormDialog.show(
+      context: context,
+      onSave: (militar) {
+        _showSnackBar('Militar ${militar.nomeGuerra} adicionado com sucesso');
+      },
+      onSchedule: (militar) {
+        _showSnackBar('Agendamento para ${militar.nomeGuerra} criado');
+      },
+    );
+  }
+
+  void _onEditMilitar(PolicialMilitarModel militar) {
+    MilitarFormDialog.show(
+      context: context,
+      militar: militar,
+      onSave: (updatedMilitar) {
+        _showSnackBar(
+          'Militar ${updatedMilitar.nomeGuerra} atualizado com sucesso',
+        );
+      },
+      onSchedule: (updatedMilitar) {
+        _showSnackBar('Agendamento para ${updatedMilitar.nomeGuerra} criado');
+      },
+    );
   }
 
   void _onSuspendAll() {

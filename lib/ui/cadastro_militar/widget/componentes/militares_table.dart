@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
 import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
-import 'militar_model_mock.dart';
+import '../../../../domain/models/policial_militar/policial_militar_model.dart';
 import 'graduacao_badge.dart';
 import 'pontos_indicator.dart';
 import 'militar_action_menu.dart';
 
 /// Tabela de militares com checkbox, avatar, graduação, etc.
 class MilitaresTable extends StatefulWidget {
-  final List<MilitarMock> militares;
+  final List<PolicialMilitarModel> militares;
   final Set<int> selectedMilitarIds;
   final int currentPage;
   final int totalPages;
   final int pageSize;
   final int totalRecords;
   final ValueChanged<Set<int>>? onSelectionChanged;
-  final ValueChanged<MilitarMock>? onMilitarDetails;
-  final ValueChanged<MilitarMock>? onMilitarEdit;
-  final ValueChanged<MilitarMock>? onMilitarDelete;
+  final ValueChanged<PolicialMilitarModel>? onMilitarDetails;
+  final ValueChanged<PolicialMilitarModel>? onMilitarEdit;
+  final ValueChanged<PolicialMilitarModel>? onMilitarDelete;
   final ValueChanged<int>? onPageChanged;
   final ValueChanged<int>? onPageSizeChanged;
 
@@ -175,7 +175,7 @@ class _MilitaresTableState extends State<MilitaresTable> {
     );
   }
 
-  Widget _buildMilitarRow(BuildContext context, MilitarMock militar) {
+  Widget _buildMilitarRow(BuildContext context, PolicialMilitarModel militar) {
     final isSelected = _selectedIds.contains(militar.id);
 
     return Container(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
 import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
-import 'militar_model_mock.dart';
+import '../../../../domain/models/policial_militar/policial_militar_model.dart';
 
 /// Badge de graduação militar
 class GraduacaoBadge extends StatelessWidget {

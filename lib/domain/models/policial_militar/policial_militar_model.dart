@@ -1,5 +1,5 @@
 /// Model de militar para a tela CadastroMilitar (dados fictícios)
-class MilitarMock {
+class PolicialMilitarModel {
   final int id;
   final String nomeGuerra;
   final Graduacao graduacao;
@@ -8,7 +8,7 @@ class MilitarMock {
   final double pontosTotais;
   final String avatarUrl;
 
-  const MilitarMock({
+  const PolicialMilitarModel({
     required this.id,
     required this.nomeGuerra,
     required this.graduacao,
@@ -133,8 +133,8 @@ extension GraduacaoExtension on Graduacao {
 }
 
 /// Dados fictícios de militares
-final List<MilitarMock> mockMilitares = [
-  const MilitarMock(
+final List<PolicialMilitarModel> mockMilitares = [
+  const PolicialMilitarModel(
     id: 1,
     nomeGuerra: 'Silva',
     graduacao: Graduacao.capitao,
@@ -143,7 +143,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 4.7,
     avatarUrl: 'https://i.pravatar.cc/150?img=1',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 2,
     nomeGuerra: 'Oliveira',
     graduacao: Graduacao.primeiro_tenente,
@@ -152,7 +152,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 3.9,
     avatarUrl: 'https://i.pravatar.cc/150?img=5',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 3,
     nomeGuerra: 'Santos',
     graduacao: Graduacao.segundo_tenente,
@@ -161,7 +161,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 4.8,
     avatarUrl: 'https://i.pravatar.cc/150?img=3',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 4,
     nomeGuerra: 'Costa',
     graduacao: Graduacao.primeiro_sargento,
@@ -170,7 +170,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 5.0,
     avatarUrl: 'https://i.pravatar.cc/150?img=9',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 5,
     nomeGuerra: 'Pereira',
     graduacao: Graduacao.segundo_sargento,
@@ -179,7 +179,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 4.2,
     avatarUrl: 'https://i.pravatar.cc/150?img=11',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 6,
     nomeGuerra: 'Ferreira',
     graduacao: Graduacao.terceiro_sargento,
@@ -188,7 +188,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 4.5,
     avatarUrl: 'https://i.pravatar.cc/150?img=12',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 7,
     nomeGuerra: 'Almeida',
     graduacao: Graduacao.cabo,
@@ -197,7 +197,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 4.1,
     avatarUrl: 'https://i.pravatar.cc/150?img=16',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 8,
     nomeGuerra: 'Rocha',
     graduacao: Graduacao.subtenente,
@@ -206,7 +206,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 3.8,
     avatarUrl: 'https://i.pravatar.cc/150?img=14',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 9,
     nomeGuerra: 'Lima',
     graduacao: Graduacao.soldado,
@@ -215,7 +215,7 @@ final List<MilitarMock> mockMilitares = [
     pontosTotais: 4.8,
     avatarUrl: 'https://i.pravatar.cc/150?img=20',
   ),
-  const MilitarMock(
+  const PolicialMilitarModel(
     id: 10,
     nomeGuerra: 'Barbosa',
     graduacao: Graduacao.major,

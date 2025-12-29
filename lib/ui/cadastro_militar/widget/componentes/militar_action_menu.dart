@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sentinela/ui/core/extensions/build_context_extension.dart';
 import 'package:sentinela/ui/core/themes/flowbite_colors.dart';
-import 'militar_model_mock.dart';
+import '../../../../domain/models/policial_militar/policial_militar_model.dart';
 
 /// Menu de ações para cada militar na tabela
 class MilitarActionMenu extends StatelessWidget {
-  final MilitarMock militar;
+  final PolicialMilitarModel militar;
   final VoidCallback? onDetails;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
