@@ -27,6 +27,12 @@ List<SingleChildWidget> get providers {
     Provider(create: (_)=> SupabaseClient(supabseUrl, supabaseKey)),
     Provider(create: (_) => InternetConnection()),
     Provider<ConnectionChecker>(create: (context)=> ConnectionCheckerImpl(context.read())),
+
+    Provider<AuthRemoteDataSource>(create: (context) => AuthRemoteDataSourceImpl(supabaseClient: context.read(), logger: context.read())),
+    //Repositories
+    ChangeNotifierProvider<AuthRepository>(create: (context) => AuthRepositoryImpl(context.read(), context.read())),
+
+
     ChangeNotifierProvider<SecureStorageService>(create: (context) => SecureStorageServiceImpl(secureStorage: context.read()) as SecureStorageService),
     Provider(create: (context) => AppLoggerImpl() as AppLogger),
     Provider(
@@ -36,6 +42,7 @@ List<SingleChildWidget> get providers {
           storageService: context.read(),
           dio: dio,
           logger: context.read(),
+          authRepository: context.read()
         );
         dio.interceptors.add(authInterceptor);
 
@@ -44,9 +51,6 @@ List<SingleChildWidget> get providers {
     ),
 
     // API Clients
-    Provider<AuthRemoteDataSource>(create: (context) => AuthRemoteDataSourceImpl(supabaseClient: context.read(), logger: context.read())),
-
-    //Repositories
-    ChangeNotifierProvider<AuthRepository>(create: (context) => AuthRepositoryImpl(context.read(), context.read())),
+   
   ];
 }

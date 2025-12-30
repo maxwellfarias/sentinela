@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
 import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 
 /// Interceptor do Dio para gerenciamento automático de autenticação
 ///
@@ -28,6 +29,7 @@ class AuthInterceptor extends Interceptor {
   final SecureStorageService _storageService;
   final Dio _dio;
   final AppLogger _logger;
+  final AuthRepository _authRepository;
 
   /// Flag para evitar loop infinito de refresh
   bool _isRefreshing = false;
@@ -41,8 +43,10 @@ class AuthInterceptor extends Interceptor {
     required SecureStorageService storageService,
     required Dio dio,
     required AppLogger logger,
+    required AuthRepository authRepository,
   }) : _storageService = storageService,
        _dio = dio,
+       _authRepository = authRepository,
        _logger = logger;
 
   /// Chamado ANTES de cada requisição ser enviada
@@ -278,16 +282,5 @@ class AuthInterceptor extends Interceptor {
   }
 
   /// Limpa todos os dados de autenticação quando o refresh falha definitivamente
-  Future<void> _clearAuthData() async {
-    try {
-      await _storageService.clearAll();
-      _logger.info('Dados de autenticação limpos', tag: _logTag);
-    } catch (e) {
-      _logger.error(
-        'Erro ao limpar dados de autenticação: $e',
-        tag: _logTag,
-        error: e,
-      );
-    }
-  }
+  Future<void> _clearAuthData() async => await _authRepository.logout();
 }

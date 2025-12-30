@@ -53,6 +53,7 @@ class AuthRepositoryImpl extends AuthRepository {
     return loginResponse;
   }
 
+  @override
   Future<Result<void>> logout() async => _remoteDataSource.logout();
 
   // @override
