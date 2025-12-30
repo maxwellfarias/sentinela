@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:sentinela/data/datasources/auth/auth_remote_data_source_impl.dart';
 import 'package:sentinela/data/datasources/auth/user_model.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
 import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
@@ -64,10 +65,7 @@ class AuthInterceptor extends Interceptor {
   /// 2. Renovar o token se necessário
   /// 3. Adiciona o Bearer token no header
   @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final url = options.path;
 
     // Não adiciona token nas rotas de autenticação
@@ -81,21 +79,20 @@ class AuthInterceptor extends Interceptor {
     }
 
     try {
-      UserModel? user;
-      await _authRepository.currentUser().map((u) => user = u);
+      CurrentSession? session = _authRepository.currentSession;
 
-      if (user == null) {
+      if (session == null) {
        await  _authRepository.logout();
         return handler.next(options);
       }
 
       // Se está próximo de expirar, renova o token
-      if (_isTokenNearExpiration(expiresAt: user!.expiresAt)) {
+      if (_isTokenNearExpiration(expiresAt: session!.expiresAt)) {
         _logger.info('Token próximo de expirar, renovando...', tag: _logTag);
         await _refreshTokenIfNeeded();
-        await _authRepository.currentUser().map((u) => user = u);
+        session = _authRepository.currentSession;
       }
-      options.headers['Authorization'] = 'Bearer $user.token';
+      options.headers['Authorization'] = 'Bearer $session.token';
       return handler.next(options);
     } catch (e) {
       _logger.error('Erro ao processar requisição: $e', tag: _logTag, error: e);
@@ -210,10 +207,9 @@ class AuthInterceptor extends Interceptor {
   Future<bool> _performRefresh() async {
     try {
 
-      UserModel? user;
-      await _authRepository.currentUser().map((u) => user = u);
+      CurrentSession? session = _authRepository.currentSession;
 
-      if(user == null) {
+      if(session == null) {
         _logger.error('Usuário não autenticado, não é possível renovar token', tag: _logTag);
         await _authRepository.logout();
         return false;
@@ -233,7 +229,7 @@ class AuthInterceptor extends Interceptor {
       // }
 
       // Cria a requisição de refresh
-      final refreshRequest = <String, dynamic>{'refresh_token': user!.refreshToken};
+      final refreshRequest = <String, dynamic>{'refresh_token': session!.refreshToken};
 
       _logger.info('Enviando requisição de refresh token', tag: _logTag);
 
