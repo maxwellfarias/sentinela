@@ -80,4 +80,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Result.error(ServidorIndisponivelException());
     }
   }
+  
+  @override
+  Future<Result<void>> logout() {
+    try {
+      _supabaseClient.auth.signOut();
+      return Future.value(Result.ok(null));
+    } catch (e) {
+      return Future.value(Result.error(ServidorIndisponivelException()));
+    }
+  }
 }

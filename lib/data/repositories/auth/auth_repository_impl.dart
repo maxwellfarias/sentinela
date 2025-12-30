@@ -7,11 +7,11 @@ import 'package:sentinela/utils/result.dart';
 
 
 class AuthRepositoryImpl extends AuthRepository {
-  final AuthRemoteDataSource remoteDataSource;
-  final ConnectionChecker connectionChecker;
+  final AuthRemoteDataSource _remoteDataSource;
+  final ConnectionChecker _connectionChecker;
    AuthRepositoryImpl(
-    this.remoteDataSource,
-    this.connectionChecker,
+    this._remoteDataSource,
+    this._connectionChecker,
   );
 
   @override
@@ -20,8 +20,8 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<Result<UserModel>> currentUser() async {
     try {
-      if (!await (connectionChecker.isConnected)) {
-        final session = remoteDataSource.currentUserSession;
+      if (!await (_connectionChecker.isConnected)) {
+        final session = _remoteDataSource.currentUserSession;
 
         if (session == null) {
           return Result.error(SessaoExpiradaException());
@@ -29,7 +29,7 @@ class AuthRepositoryImpl extends AuthRepository {
         final userResponse = UserModel(id: session.user.id, email: session.user.email ?? '', name: '');
         return Result.ok(userResponse);
       }
-      final user = await remoteDataSource.getCurrentUserData()
+      final user = await _remoteDataSource.getCurrentUserData()
       .map((user) {
         if (user == null) {
           throw SessaoExpiradaException();
@@ -37,7 +37,7 @@ class AuthRepositoryImpl extends AuthRepository {
         return user;
       });
 
-      return user;
+        return user;
     } on SessaoExpiradaException {
       return Result.error(SessaoExpiradaException());
     } catch (e) {
@@ -47,11 +47,13 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<Result<UserModel>> loginWithEmailPassword({required String email, required String password}) async {
-    if (!await (connectionChecker.isConnected)) return Result.error(SemConexaoException());
-    final loginResponse =  await remoteDataSource.loginWithEmailPassword(email: email, password: password);
+    if (!await (_connectionChecker.isConnected)) return Result.error(SemConexaoException());
+    final loginResponse =  await _remoteDataSource.loginWithEmailPassword(email: email, password: password);
     notifyListeners();
     return loginResponse;
   }
+
+  Future<Result<void>> logout() async => _remoteDataSource.logout();
 
   // @override
   // Future<Either<Failure, User>> signUpWithEmailPassword({
