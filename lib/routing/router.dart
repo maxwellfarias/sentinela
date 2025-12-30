@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository_supa.dart';
 import 'package:sentinela/routing/routes.dart';
 import 'package:sentinela/ui/cadastro_militar/widget/cadastro_militar.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/resposive_layout.dart';
@@ -11,8 +11,6 @@ import 'package:sentinela/ui/kabam/widget/kabam.dart';
 import 'package:sentinela/ui/login/widget/login_screen.dart';
 import 'package:sentinela/ui/login/widget/viewmodel/login_viewmodel.dart';
 import 'package:sentinela/ui/p1_screen/widget/p1_screen.dart';
-import 'package:sentinela/ui/patrol_map/viewmodel/patrol_map_viewmodel.dart';
-import 'package:sentinela/ui/patrol_map/widget/patrol_map_screen.dart';
 
 final _rootNavigationKey = GlobalKey<NavigatorState>();
 final _mainShellNavigatorKey = GlobalKey<NavigatorState>();

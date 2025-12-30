@@ -1,5 +1,5 @@
-import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository_supa.dart';
 import 'package:sentinela/utils/command.dart';
 import 'package:sentinela/utils/result.dart';
 
@@ -15,7 +15,7 @@ final class LoginViewmodel {
   late final Command1<dynamic, ({String email, String password})> login;
 
   Future<Result<dynamic>> _login(({String email, String password}) params) async {
-    final result = await _authRepository.login(email: params.email, password: params.password);
+    final result = await _authRepository.loginWithEmailPassword(email: params.email, password: params.password);
     return result;
   }
 }

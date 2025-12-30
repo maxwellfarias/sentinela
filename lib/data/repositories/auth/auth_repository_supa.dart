@@ -1,16 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:sentinela/data/datasources/auth/auth_remote_data_source.dart';
 import 'package:sentinela/data/datasources/auth/user_model.dart';
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/network/connection_checker.dart';
 import 'package:sentinela/utils/result.dart';
 
-class AuthRepositoryImpl {
+
+abstract class AuthRepository extends ChangeNotifier {
+  Future<bool> get isAuthenticated;
+  Future<Result<UserModel>> currentUser();
+  Future<Result<UserModel>> loginWithEmailPassword({required String email, required String password});
+}
+
+class AuthRepositoryImpl extends AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final ConnectionChecker connectionChecker;
-  const AuthRepositoryImpl(
+   AuthRepositoryImpl(
     this.remoteDataSource,
     this.connectionChecker,
   );
+
+  @override
+  Future<bool> get isAuthenticated async => currentUser().then((result) => result.isOk);
 
   @override
   Future<Result<UserModel>> currentUser() async {
@@ -21,9 +32,8 @@ class AuthRepositoryImpl {
         if (session == null) {
           return Result.error(SessaoExpiradaException());
         }
-
-        return Result.ok(UserModel(id: session.user.id, email: session.user.email ?? '', name: ''),
-        );
+        final userResponse = UserModel(id: session.user.id, email: session.user.email ?? '', name: '');
+        return Result.ok(userResponse);
       }
       final user = await remoteDataSource.getCurrentUserData()
       .map((user) {
@@ -42,16 +52,9 @@ class AuthRepositoryImpl {
   }
 
   @override
-  Future<Result<UserModel>> loginWithEmailPassword({
-    required String email,
-    required String password,
-  }) async {
-    return _getUser(
-      () async => await remoteDataSource.loginWithEmailPassword(
-        email: email,
-        password: password,
-      ),
-    );
+  Future<Result<UserModel>> loginWithEmailPassword({required String email, required String password}) async {
+    if (!await (connectionChecker.isConnected)) return Result.error(SemConexaoException());
+    return await remoteDataSource.loginWithEmailPassword(email: email, password: password);
   }
 
   // @override
@@ -68,12 +71,4 @@ class AuthRepositoryImpl {
   //     ),
   //   );
   // }
-
-  Future<Result<UserModel>> _getUser(Future<Result<UserModel>> Function() fn) async {
-      if (!await (connectionChecker.isConnected)) {
-        return Result.error(SemConexaoException());
-      }
-      final user = await fn();
-      return user;
-  }
 }

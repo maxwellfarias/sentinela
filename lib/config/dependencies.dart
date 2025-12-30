@@ -1,22 +1,31 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:sentinela/data/repositories/auth/auth_repository.dart';
-import 'package:sentinela/data/repositories/auth/auth_repository_impl.dart';
-import 'package:sentinela/data/datasources/api/auth_api_client/auth_api_client.dart';
-import 'package:sentinela/data/datasources/api/auth_api_client/auth_api_client_impl.dart';
+import 'package:sentinela/data/datasources/auth/auth_remote_data_source.dart';
+import 'package:sentinela/data/datasources/auth/auth_remote_data_source_impl.dart';
 import 'package:sentinela/data/datasources/auth/interceptor/dio_interceptor.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
 import 'package:sentinela/data/datasources/logger/app_logger_impl.dart';
 import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository_supa.dart';
+import 'package:sentinela/utils/network/connection_checker.dart';
+import 'package:sentinela/utils/network/connection_checker_impl.dart';
+import 'package:supabase/supabase.dart';
 
 List<SingleChildWidget> get providers {
   final urlBaseAuth = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/auth/v1/';
-  final urlBase = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/rest/v1/'; 
+  final urlBase = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/rest/v1/';
+  final supabseUrl = 'https://dqsbpsifdyujbbvbzjdq.supabase.co';
+  final supabaseKey = dotenv.env['SUPABASE_KEY'] ?? '';
 
   return [
     Provider(create: (_) => FlutterSecureStorage() ),
+    Provider(create: (_)=> SupabaseClient(supabseUrl, supabaseKey)),
+    Provider(create: (_) => InternetConnection()),
+    Provider<ConnectionChecker>(create: (context)=> ConnectionCheckerImpl(context.read())),
     ChangeNotifierProvider<SecureStorageService>(create: (context) => SecureStorageServiceImpl(secureStorage: context.read()) as SecureStorageService),
     Provider(create: (context) => AppLoggerImpl() as AppLogger),
     Provider(
@@ -32,26 +41,11 @@ List<SingleChildWidget> get providers {
         return dio;
       },
     ),
-    Provider(create: (_) => AppLoggerImpl() as AppLogger),
 
     // API Clients
-    Provider(
-      create: (context) =>
-          AuthApiClientImpl(
-                url: urlBaseAuth,
-                dio: context.read(),
-                logger: context.read(),
-              )
-              as AuthApiClient,
-    ),
+    Provider<AuthRemoteDataSource>(create: (context) => AuthRemoteDataSourceImpl(supabaseClient: context.read(), logger: context.read())),
 
     //Repositories
-    ChangeNotifierProvider<AuthRepository>(
-      create: (context) => AuthRepositoryImpl(
-        authApiClient: context.read(),
-        logger: context.read(),
-        storageService: context.read(),
-      ),
-    ),
+    ChangeNotifierProvider<AuthRepository>(create: (context) => AuthRepositoryImpl(context.read(), context.read())),
   ];
 }
