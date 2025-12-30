@@ -19,11 +19,12 @@ import 'package:supabase/supabase.dart';
 List<SingleChildWidget> get providers {
   final urlBaseAuth = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/auth/v1/';
   final urlBase = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/rest/v1/';
-  final supabseUrl = 'https://dqsbpsifdyujbbvbzjdq.supabase.co';
+  final supabseUrl = 'https://fkwbaagyzxafgaphidfb.supabase.co';
   final supabaseKey = dotenv.env['SUPABASE_PUBLISHABLE_KEY'] ?? '';
 
   return [
-    Provider(create: (_) => FlutterSecureStorage() ),
+    Provider(create: (context) => AppLoggerImpl() as AppLogger),
+    Provider(create: (_) => FlutterSecureStorage()),
     Provider(create: (_)=> SupabaseClient(supabseUrl, supabaseKey)),
     Provider(create: (_) => InternetConnection()),
     Provider<ConnectionChecker>(create: (context)=> ConnectionCheckerImpl(context.read())),
@@ -34,7 +35,6 @@ List<SingleChildWidget> get providers {
 
 
     ChangeNotifierProvider<SecureStorageService>(create: (context) => SecureStorageServiceImpl(secureStorage: context.read()) as SecureStorageService),
-    Provider(create: (context) => AppLoggerImpl() as AppLogger),
     Provider(
       create: (context) {
         final dio = Dio();

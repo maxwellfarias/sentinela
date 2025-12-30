@@ -55,19 +55,4 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<Result<void>> logout() async => _remoteDataSource.logout();
-
-  // @override
-  // Future<Either<Failure, User>> signUpWithEmailPassword({
-  //   required String name,
-  //   required String email,
-  //   required String password,
-  // }) async {
-  //   return _getUser(
-  //     () async => await remoteDataSource.signUpWithEmailPassword(
-  //       name: name,
-  //       email: email,
-  //       password: password,
-  //     ),
-  //   );
-  // }
 }

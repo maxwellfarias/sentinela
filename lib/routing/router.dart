@@ -24,7 +24,7 @@ GoRouter router({required AuthRepository authRepository}) => GoRouter(
   debugLogDiagnostics: true,
   refreshListenable: authRepository,
   redirect: (context, state) async {
-    final loggedIn = await authRepository.isAuthenticated;
+    final loggedIn = await authRepository.isAuthen]ticated;
     final loggingIn = state.matchedLocation == Routes.login;
 
     // Se não estiver autenticado e não estiver na tela de login, redireciona para login
