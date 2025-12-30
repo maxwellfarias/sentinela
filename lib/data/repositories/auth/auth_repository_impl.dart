@@ -26,7 +26,14 @@ class AuthRepositoryImpl extends AuthRepository {
         if (session == null) {
           return Result.error(SessaoExpiradaException());
         }
-        final userResponse = UserModel(id: session.user.id, email: session.user.email ?? '', name: '');
+        final userResponse = UserModel(
+          id: session.user.id,
+          email: session.user.email ?? '',
+          name: '',
+          accessToken: session.accessToken,
+          expiresAt: session.expiresAt ?? 0,
+          refreshToken: session.refreshToken ?? '',
+        );
         return Result.ok(userResponse);
       }
       final user = await _remoteDataSource.getCurrentUserData()

@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:sentinela/data/datasources/auth/user_model.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
 import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
 import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/utils/result.dart';
+import 'package:supabase/supabase.dart';
 
 /// Interceptor do Dio para gerenciamento automático de autenticação
 ///
@@ -26,10 +29,11 @@ import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 /// 5. Requisição prossegue normalmente
 /// ```
 class AuthInterceptor extends Interceptor {
-  final SecureStorageService _storageService;
   final Dio _dio;
   final AppLogger _logger;
   final AuthRepository _authRepository;
+  final String _urlRefresh;
+  final String _apiKey;
 
   /// Flag para evitar loop infinito de refresh
   bool _isRefreshing = false;
@@ -44,9 +48,13 @@ class AuthInterceptor extends Interceptor {
     required Dio dio,
     required AppLogger logger,
     required AuthRepository authRepository,
-  }) : _storageService = storageService,
+    required String urlRefresh,
+    required String apiKey,
+  }) :
        _dio = dio,
        _authRepository = authRepository,
+        _urlRefresh = urlRefresh,
+        _apiKey = apiKey,
        _logger = logger;
 
   /// Chamado ANTES de cada requisição ser enviada
@@ -56,44 +64,51 @@ class AuthInterceptor extends Interceptor {
   /// 2. Renovar o token se necessário
   /// 3. Adiciona o Bearer token no header
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final url = options.path;
 
     // Não adiciona token nas rotas de autenticação
     if (_isAuthenticationRoute(url)) {
-      _logger.info('Requisição para rota de autenticação, sem adicionar token', tag: _logTag);
+      _logger.info(
+        'Requisição para rota de autenticação, sem adicionar token',
+        tag: _logTag,
+      );
       // Ignora o token e prossegue
       return handler.next(options);
     }
 
     try {
-      // Verifica se o token está próximo de expirar
-      final isNearExpirationResult = await _storageService.isTokenNearExpiration();
-      final isNearExpiration = isNearExpirationResult.getSuccessOrNull();
+      UserModel? user;
+      await _authRepository.currentUser().map((u) => user = u);
+
+      if (user == null) {
+       await  _authRepository.logout();
+        return handler.next(options);
+      }
 
       // Se está próximo de expirar, renova o token
-      if (isNearExpiration == true) {
+      if (_isTokenNearExpiration(expiresAt: user!.expiresAt)) {
         _logger.info('Token próximo de expirar, renovando...', tag: _logTag);
         await _refreshTokenIfNeeded();
+        await _authRepository.currentUser().map((u) => user = u);
       }
-
-      // Obtém o token atual (renovado ou não)
-      final tokenResult = await _storageService.getToken();
-      final token = tokenResult.getSuccessOrNull();
-
-      if (token != null) {
-        // Adiciona o Bearer token no header
-        options.headers['Authorization'] = 'Bearer $token';
-        _logger.info('Token adicionado ao header da requisição', tag: _logTag);
-      } else {
-        _logger.warning('Nenhum token disponível para adicionar', tag: _logTag);
-      }
-
+      options.headers['Authorization'] = 'Bearer $user.token';
       return handler.next(options);
     } catch (e) {
       _logger.error('Erro ao processar requisição: $e', tag: _logTag, error: e);
       return handler.next(options);
     }
+  }
+
+  bool _isTokenNearExpiration({required int expiresAt}) {
+    // Converte o expiresAt (timestamp em segundos) para DateTime. É necessário multiplicar por 1000 para converter para milissegundos
+    final expiresDate = DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000);
+    final now = DateTime.now();
+    final difference = expiresDate.difference(now);
+    return difference.inMinutes < 5;
   }
 
   /// Chamado quando uma requisição FALHA com erro
@@ -108,10 +123,7 @@ class AuthInterceptor extends Interceptor {
     // Se o erro for 401 (não autorizado) e não for rota de auth
     if (err.response?.statusCode == 401 &&
         !_isAuthenticationRoute(err.requestOptions.path)) {
-      _logger.warning(
-        'Erro 401 detectado, tentando renovar token...',
-        tag: _logTag,
-      );
+      _logger.warning('Erro 401 detectado, tentando renovar token...', tag: _logTag);
 
       // Tenta renovar o token
       final refreshSuccess = await _refreshTokenIfNeeded();
@@ -121,18 +133,22 @@ class AuthInterceptor extends Interceptor {
         try {
           _logger.info('Token renovado, refazendo requisição', tag: _logTag);
 
-          // Obtém o novo token
-          final tokenResult = await _storageService.getToken();
-          final newToken = tokenResult.getSuccessOrNull();
 
-          if (newToken != null) {
+          UserModel? user;
+          await _authRepository.currentUser().map((u) => user = u);
+          if (user == null) {
+            _logger.error('Usuário não autenticado após refresh', tag: _logTag);
+            await _authRepository.logout();
+            return handler.next(err);
+          }
+
             // Atualiza o header com o novo token
-            err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+            err.requestOptions.headers['Authorization'] = 'Bearer $user.token';
 
             // Refaz a requisição original
             final response = await _dio.fetch(err.requestOptions);
             return handler.resolve(response);
-          }
+          
         } catch (e) {
           _logger.error(
             'Erro ao refazer requisição após refresh: $e',
@@ -170,7 +186,10 @@ class AuthInterceptor extends Interceptor {
   Future<bool> _refreshTokenIfNeeded() async {
     // Se já está renovando, aguarda o resultado do refresh em andamento
     if (_isRefreshing && _refreshFuture != null) {
-      _logger.info('Refresh já em andamento, aguardando resultado...',  tag: _logTag);
+      _logger.info(
+        'Refresh já em andamento, aguardando resultado...',
+        tag: _logTag,
+      );
       return await _refreshFuture!;
     }
 
@@ -190,45 +209,44 @@ class AuthInterceptor extends Interceptor {
   /// Executa a renovação do token
   Future<bool> _performRefresh() async {
     try {
-      // Obtém o token e refresh token atuais
-      final tokenResult = await _storageService.getToken();
-      final refreshTokenResult = await _storageService.getRefreshToken();
 
-      final token = tokenResult.getSuccessOrNull();
-      final refreshToken = refreshTokenResult.getSuccessOrNull();
+      UserModel? user;
+      await _authRepository.currentUser().map((u) => user = u);
 
-      if (token == null || refreshToken == null) {
-        _logger.error('Token ou refresh token não disponível', tag: _logTag);
-        await _clearAuthData();
+      if(user == null) {
+        _logger.error('Usuário não autenticado, não é possível renovar token', tag: _logTag);
+        await _authRepository.logout();
         return false;
       }
 
+      // // Obtém o token e refresh token atuais
+      // final tokenResult = await _storageService.getToken();
+      // final refreshTokenResult = await _storageService.getRefreshToken();
+
+      // final token = tokenResult.getSuccessOrNull();
+      // final refreshToken = refreshTokenResult.getSuccessOrNull();
+
+      // if (token == null || refreshToken == null) {
+      //   _logger.error('Token ou refresh token não disponível', tag: _logTag);
+      //   await _clearAuthData();
+      //   return false;
+      // }
+
       // Cria a requisição de refresh
-      final refreshRequest = <String, dynamic>{
-        'refresh_token': refreshToken,
-      };
+      final refreshRequest = <String, dynamic>{'refresh_token': user!.refreshToken};
 
       _logger.info('Enviando requisição de refresh token', tag: _logTag);
 
       // Faz a requisição de refresh (sem o interceptor para evitar loop)
       final response = await _dio.post(
-        "https://fkwbaagyzxafgaphidfb.supabase.co/auth/v1/token?grant_type=refresh_token",
+        _urlRefresh,
         data: refreshRequest,
         options: Options(
-          headers: {'apikey': 'sb_publishable_yehVgeZN4iWGS4nrEGRb2w_-A9MQt6K'},
+          headers: {'apikey': _apiKey},
         ),
       );
 
       if (response.statusCode == 200) {
-        // Parse da resposta
-        final data = response.data as Map<String, dynamic>;
-
-        // Salva os novos tokens e informações
-        await _storageService.saveToken(data['token'] as String);
-        await _storageService.saveRefreshToken(data['refreshToken'] as String);
-        await _storageService.saveTokenExpires(data['expires'] as String);
-
-        _logger.info('Token renovado com sucesso', tag: _logTag);
         return true;
       } else if (response.statusCode == 401) {
         // Refresh token também expirou ou é inválido
@@ -236,7 +254,7 @@ class AuthInterceptor extends Interceptor {
           'Refresh token inválido ou expirado (401). Limpando dados de autenticação.',
           tag: _logTag,
         );
-        await _clearAuthData();
+        await _authRepository.logout();
         return false;
       } else if (response.statusCode == 400) {
         // Dados inválidos na requisição
@@ -244,7 +262,7 @@ class AuthInterceptor extends Interceptor {
           'Requisição de refresh inválida (400). Limpando dados de autenticação.',
           tag: _logTag,
         );
-        await _clearAuthData();
+        await _authRepository.logout();
         return false;
       } else {
         _logger.error(
@@ -267,7 +285,7 @@ class AuthInterceptor extends Interceptor {
           'Refresh token inválido ou expirado (DioException 401). Limpando dados.',
           tag: _logTag,
         );
-        await _clearAuthData();
+        await _authRepository.logout();
       }
 
       return false;
@@ -280,7 +298,4 @@ class AuthInterceptor extends Interceptor {
       return false;
     }
   }
-
-  /// Limpa todos os dados de autenticação quando o refresh falha definitivamente
-  Future<void> _clearAuthData() async => await _authRepository.logout();
 }

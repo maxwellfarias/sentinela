@@ -42,7 +42,9 @@ List<SingleChildWidget> get providers {
           storageService: context.read(),
           dio: dio,
           logger: context.read(),
-          authRepository: context.read()
+          authRepository: context.read(),
+          urlRefresh: '${urlBaseAuth}token?grant_type=refresh_token',
+          apiKey: supabaseKey,
         );
         dio.interceptors.add(authInterceptor);
 
