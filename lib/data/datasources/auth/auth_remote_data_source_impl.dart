@@ -1,27 +1,11 @@
 import 'package:sentinela/data/datasources/auth/auth_remote_data_source.dart';
-import 'package:sentinela/data/datasources/auth/user_model.dart';
+import 'package:sentinela/domain/models/user/user_model.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
+import 'package:sentinela/domain/models/auth/session_model.dart';
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/result.dart';
 import 'package:supabase/supabase.dart';
 
-final class CurrentSession {
-  final String accessToken;
-  final int expiresAt;
-  final String refreshToken;
-  CurrentSession({
-    required this.accessToken,
-    required this.expiresAt,
-    required this.refreshToken,
-  });
-  factory CurrentSession.fromJson(Map<String, dynamic> json) {
-    return CurrentSession(
-      accessToken: json['access_token'],
-      expiresAt: json['expires_at'],
-      refreshToken: json['refresh_token'],
-    );
-  }
-}
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final SupabaseClient _supabaseClient;

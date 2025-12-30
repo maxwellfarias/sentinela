@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:sentinela/data/datasources/auth/auth_remote_data_source_impl.dart';
-import 'package:sentinela/data/datasources/auth/user_model.dart';
+import 'package:sentinela/domain/models/user/user_model.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
 import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
 import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/domain/models/auth/session_model.dart';
 import 'package:sentinela/utils/result.dart';
 import 'package:supabase/supabase.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:sentinela/data/datasources/auth/user_model.dart';
+import 'package:sentinela/domain/models/user/user_model.dart';
 import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 import 'package:sentinela/utils/command.dart';
 import 'package:sentinela/utils/result.dart';
