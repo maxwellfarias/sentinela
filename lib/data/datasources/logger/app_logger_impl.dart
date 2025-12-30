@@ -1,6 +1,6 @@
 import 'dart:developer' as dev;
 
-import 'package:sentinela/data/services/logger/app_logger.dart';
+import 'package:sentinela/data/datasources/logger/app_logger.dart';
 
 /// Implementação concreta do Logger usando dart:developer.
 ///

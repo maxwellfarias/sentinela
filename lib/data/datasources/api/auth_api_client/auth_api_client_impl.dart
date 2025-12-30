@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:sentinela/data/services/api/auth_api_client/auth_api_client.dart';
-import 'package:sentinela/data/services/logger/app_logger.dart';
+import 'package:sentinela/data/datasources/api/auth_api_client/auth_api_client.dart';
+import 'package:sentinela/data/datasources/logger/app_logger.dart';
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/result.dart';
 

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:sentinela/data/services/logger/app_logger.dart';
-import 'package:sentinela/data/services/secure_storage/secure_storage_service.dart';
+import 'package:sentinela/data/datasources/logger/app_logger.dart';
+import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
 
 /// Interceptor do Dio para gerenciamento automático de autenticação
 ///

@@ -1,8 +1,8 @@
 import 'package:sentinela/data/model/login_response_api_model.dart';
 import 'package:sentinela/data/repositories/auth/auth_repository.dart';
-import 'package:sentinela/data/services/api/auth_api_client/auth_api_client.dart';
-import 'package:sentinela/data/services/logger/app_logger.dart';
-import 'package:sentinela/data/services/secure_storage/secure_storage_service.dart';
+import 'package:sentinela/data/datasources/api/auth_api_client/auth_api_client.dart';
+import 'package:sentinela/data/datasources/logger/app_logger.dart';
+import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
 import 'package:sentinela/exceptions/app_exception.dart';
 import 'package:sentinela/utils/result.dart';
 

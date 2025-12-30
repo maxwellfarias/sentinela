@@ -4,12 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:sentinela/data/repositories/auth/auth_repository.dart';
 import 'package:sentinela/data/repositories/auth/auth_repository_impl.dart';
-import 'package:sentinela/data/services/api/auth_api_client/auth_api_client.dart';
-import 'package:sentinela/data/services/api/auth_api_client/auth_api_client_impl.dart';
-import 'package:sentinela/data/services/auth/interceptor/dio_interceptor.dart';
-import 'package:sentinela/data/services/logger/app_logger.dart';
-import 'package:sentinela/data/services/logger/app_logger_impl.dart';
-import 'package:sentinela/data/services/secure_storage/secure_storage_service.dart';
+import 'package:sentinela/data/datasources/api/auth_api_client/auth_api_client.dart';
+import 'package:sentinela/data/datasources/api/auth_api_client/auth_api_client_impl.dart';
+import 'package:sentinela/data/datasources/auth/interceptor/dio_interceptor.dart';
+import 'package:sentinela/data/datasources/logger/app_logger.dart';
+import 'package:sentinela/data/datasources/logger/app_logger_impl.dart';
+import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
 
 List<SingleChildWidget> get providers {
   final urlBaseAuth = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/auth/v1/';
