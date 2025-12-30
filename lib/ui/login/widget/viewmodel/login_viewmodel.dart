@@ -1,5 +1,6 @@
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
-import 'package:sentinela/data/repositories/auth/auth_repository_supa.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository_impl.dart';
 import 'package:sentinela/utils/command.dart';
 import 'package:sentinela/utils/result.dart';
 

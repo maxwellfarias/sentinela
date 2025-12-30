@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sentinela/data/repositories/auth/auth_repository_supa.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository_impl.dart';
 import 'package:sentinela/routing/routes.dart';
 import 'package:sentinela/ui/cadastro_militar/widget/cadastro_militar.dart';
 import 'package:sentinela/ui/core/componentes_reutilizaveis/resposive_layout.dart';
@@ -21,6 +22,7 @@ GoRouter router({required AuthRepository authRepository}) => GoRouter(
   // initialLocation: Routes.gerarXmlDocumentacaoAcademica,
   initialLocation: Routes.cadastroMilitar,
   debugLogDiagnostics: true,
+  refreshListenable: authRepository,
   redirect: (context, state) async {
     final loggedIn = await authRepository.isAuthenticated;
     final loggingIn = state.matchedLocation == Routes.login;

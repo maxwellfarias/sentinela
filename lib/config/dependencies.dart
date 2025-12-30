@@ -6,11 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:sentinela/data/datasources/auth/auth_remote_data_source.dart';
 import 'package:sentinela/data/datasources/auth/auth_remote_data_source_impl.dart';
-import 'package:sentinela/data/datasources/auth/interceptor/dio_interceptor.dart';
+import 'package:sentinela/data/datasources/interceptor/dio_interceptor.dart';
 import 'package:sentinela/data/datasources/logger/app_logger.dart';
 import 'package:sentinela/data/datasources/logger/app_logger_impl.dart';
 import 'package:sentinela/data/datasources/secure_storage/secure_storage_service.dart';
-import 'package:sentinela/data/repositories/auth/auth_repository_supa.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository.dart';
+import 'package:sentinela/data/repositories/auth/auth_repository_impl.dart';
 import 'package:sentinela/utils/network/connection_checker.dart';
 import 'package:sentinela/utils/network/connection_checker_impl.dart';
 import 'package:supabase/supabase.dart';
@@ -19,7 +20,7 @@ List<SingleChildWidget> get providers {
   final urlBaseAuth = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/auth/v1/';
   final urlBase = 'https://dqsbpsifdyujbbvbzjdq.supabase.co/rest/v1/';
   final supabseUrl = 'https://dqsbpsifdyujbbvbzjdq.supabase.co';
-  final supabaseKey = dotenv.env['SUPABASE_KEY'] ?? '';
+  final supabaseKey = dotenv.env['SUPABASE_PUBLISHABLE_KEY'] ?? '';
 
   return [
     Provider(create: (_) => FlutterSecureStorage() ),
